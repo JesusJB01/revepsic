@@ -22,7 +22,7 @@ interface BlogPost {
 
 async function getData() {
   try {
-    const response = await fetch("/api/blog");
+    const response = await fetch("https://localhost:3000/api/blog");
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");

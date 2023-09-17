@@ -16,7 +16,7 @@ interface BlogEntry {
 
 export async function getData() {
   try {
-    const response = await fetch("/api/blog", {cache: "no-store"});
+    const response = await fetch("https://localhost:3000/api/blog", {cache: "no-store"});
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");
