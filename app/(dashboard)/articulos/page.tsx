@@ -22,7 +22,7 @@ interface BlogPost {
 
 async function getData() {
   try {
-    const response = await fetch("https://vercel.com/jesusjb01/revepsic/Fw3dmZmzxErzS94Uq9pEQrgVu3MH/api/blog");
+    const response = await fetch("https://revepsic-r10ywalrw-jesusjb01.vercel.app/api/blog");
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");

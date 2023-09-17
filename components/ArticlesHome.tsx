@@ -15,7 +15,7 @@ interface BlogEntry {
 
 export async function getData() {
   try {
-    const response = await fetch("https://vercel.com/jesusjb01/revepsic/Fw3dmZmzxErzS94Uq9pEQrgVu3MH/api/blog", {cache: "no-store"});
+    const response = await fetch("https://revepsic-r10ywalrw-jesusjb01.vercel.app/api/blog", {cache: "no-store"});
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");
