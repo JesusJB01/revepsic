@@ -11,7 +11,7 @@ interface ArticleData {
 
 export async function getData() {
   try {
-    const response = await fetch("https://revepsic-r10ywalrw-jesusjb01.vercel.app/api/blog");
+    const response = await fetch("https://revepsic-44883i71s-jesusjb01.vercel.app/api/blog");
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");
