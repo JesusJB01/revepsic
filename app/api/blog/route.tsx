@@ -3,9 +3,12 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic';
 
+export async function GET() {
+    const supabase = createClientComponentClient({
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    });
 
-export  async function GET() {
-    const supabase = createClientComponentClient();
     try {
         const { data, error } = await supabase
             .from('blog')
@@ -21,6 +24,4 @@ export  async function GET() {
         console.error('Error inesperado:', error);
         return NextResponse.json({ error: 'Error inesperado' }); // Devuelve una respuesta de error con estado 500
     }
-
-    
 }
