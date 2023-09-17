@@ -1,4 +1,7 @@
 import './globals.css'
+import { Providers } from "./providers";
+import NavMenu from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: 'Create Next App',
@@ -11,11 +14,17 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>
-        <main className="min-h-screen bg-background flex flex-col items-center">
+    <html lang="en" suppressHydrationWarning>
+      <body className="dark:bg-slate-800">
+      <Providers>
+      <header >
+            <NavMenu />
+          </header>
+        <main className="min-h-screen ">
           {children}
         </main>
+        <Footer/>
+        </Providers>
       </body>
     </html>
   )
