@@ -13,7 +13,7 @@ interface BlogEntry {
   content: string;
   slug: string;
 }
-
+/* 
 export async function getData() {
   const apiUrl = process.env.URL_VERCEL || "http://localhost:3000";
 
@@ -32,11 +32,11 @@ export async function getData() {
     console.error("Error al obtener datos:", error);
     throw error; // Propaga el error para que pueda ser manejado más arriba si es necesario.
   }
-}
+} */
 
 export default async function ArticlesHome() {
-  const data = await getData();
-  const ultimosArticulos: BlogEntry[] = data?.data.slice(-4) || [];
+  /* const data = await getData();
+  const ultimosArticulos: BlogEntry[] = data?.data.slice(-4) || []; */
 
   return (
     <div className="bg-gray-100 w-full pb-10 dark:bg-slate-500">
@@ -80,7 +80,7 @@ export default async function ArticlesHome() {
           </Link>
         </section>
 
-        {/* Cuatro tarjetas adicionales */}
+     {/*    
         <section className="grid grid-cols-2 gap-x-3 gap-y-3">
           {ultimosArticulos.map((user) => (
             <CustomCard
@@ -91,7 +91,7 @@ export default async function ArticlesHome() {
               slug={user.slug}
             />
           ))}
-        </section>
+        </section> */}
       </div>
     </div>
   );

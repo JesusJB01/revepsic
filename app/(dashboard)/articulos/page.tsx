@@ -19,7 +19,7 @@ interface BlogPost {
   created_at: string;
   description: string;
 }
-
+/* 
 async function getData() {
   const apiUrl = process.env.URL_VERCEL || "http://localhost:3000";
 
@@ -37,10 +37,10 @@ async function getData() {
     console.error("Error al obtener datos:", error);
     throw error;
   }
-}
+} */
 
 function Page() {
-  const supabase = createClientComponentClient();
+  /* const supabase = createClientComponentClient();
   const [data, setData] = useState<BlogPost[]>([]);
 
   useEffect(() => {
@@ -68,11 +68,17 @@ function Page() {
     } catch (error) {
       console.error('Error al eliminar el registro:', error);
     }
-  };
+  }; */
+
+  const data = [
+    {},
+    {},
+    {},
+  ]
 
   return (
     <div className="p-4">
-      <Table  aria-label="Tabla de artículos">
+     {/*  <Table  aria-label="Tabla de artículos">
         <TableHeader>
           <TableColumn>ID</TableColumn>
           <TableColumn>Title</TableColumn>
@@ -84,7 +90,7 @@ function Page() {
               <TableCell>{item.id}</TableCell>
               <TableCell>{item.title}</TableCell>
               <TableCell>
-                {/* Agregamos un Tooltip al ícono de eliminación */}
+                
                 <Tooltip color="danger" content="Delete user">
                   <DeleteIcon
                     onClick={() => handleDeleteClick(item.id)}
@@ -95,7 +101,7 @@ function Page() {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </Table> */}
     </div>
   );
 }
