@@ -6,14 +6,8 @@ import Link from "next/link";
 
 export default function Article({ title, imageSrc, summary, slug}: { title: string, imageSrc: string, summary: string, slug:string }) {
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 
-  const url = `${apiUrl}/blog/${slug}`;
-
-  console.log("apiUrl:", apiUrl);
-console.log("slug:", slug);
-console.log("url:", url);
   
 
     return (
@@ -28,7 +22,7 @@ console.log("url:", url);
         <h2 className="pt-4 pb-2 text-lg font-bold">{title}</h2>
         <p className="text-justify pb-4">{summary}</p>
         <div>
-        <Link href={url} className="bg-violet-600 px-4 py-2 rounded-lg text-white">
+        <Link href={"https://revepsic-8uq11.vercel.app/blog/${blog}"} className="bg-violet-600 px-4 py-2 rounded-lg text-white">
     Leer más
   </Link>
         </div>
