@@ -8,9 +8,13 @@ export default function Article({ title, imageSrc, summary, slug}: { title: stri
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+
   const url = `${apiUrl}/blog/${slug}`;
 
-  console.log(url);
+  console.log("apiUrl:", apiUrl);
+console.log("slug:", slug);
+console.log("url:", url);
+  
 
     return (
       <div className="bg-white rounded-lg p-6 dark:text-black">
