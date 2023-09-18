@@ -21,12 +21,12 @@ interface BlogPost {
 }
 
 async function getData() {
-  const apiUrl = process.env.URL_VERCEL || "http://localhost:3000";
+  const apiUrl = process.env.URL_VERCEL 
 
   try {
     const response = await fetch(`${apiUrl}/api/blog`);
 
-    if (!response.ok) {
+    if (!response) {
       throw new Error("Error al obtener datos de la API");
     }
 
@@ -40,15 +40,18 @@ async function getData() {
   }
 }
 
-function Page() {
+async function Page() {
   const supabase = createClientComponentClient();
   const [data, setData] = useState<BlogPost[]>([]);
 
-  useEffect(() => {
+  const response = await getData();
+  setData(response);
+
+  /* useEffect(() => {
     getData().then((apiData) => {
       setData(apiData.data);
     });
-  }, []);
+  }, []); */
 
   const handleDeleteClick = async (id: number) => {
     try {
