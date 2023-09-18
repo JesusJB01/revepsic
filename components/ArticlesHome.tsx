@@ -18,7 +18,7 @@ export async function getData() {
   const apiUrl = process.env.URL_VERCEL || "http://localhost:3000";
 
   try {
-    const response = await fetch(`${apiUrl}/api/blog`);
+    const response = await fetch(`${apiUrl}/api/blog`, {cache: "no-store"});
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");
