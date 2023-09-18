@@ -5,7 +5,9 @@ import NextImage from "next/image";
 import Link from "next/link";
 
 export default function Article({ title, imageSrc, summary, slug}: { title: string, imageSrc: string, summary: string, slug:string }) {
-  
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
     return (
       <div className="bg-white rounded-lg p-6 dark:text-black">
         <Image
@@ -18,7 +20,7 @@ export default function Article({ title, imageSrc, summary, slug}: { title: stri
         <h2 className="pt-4 pb-2 text-lg font-bold">{title}</h2>
         <p className="text-justify pb-4">{summary}</p>
         <div>
-        <Link href={`${process.env.URL_VERCEL}/blog/${slug}`} className="bg-violet-600 px-4 py-2 rounded-lg text-white">
+        <Link href={`${apiUrl}/blog/${slug}`} className="bg-violet-600 px-4 py-2 rounded-lg text-white">
     Leer más
   </Link>
         </div>
