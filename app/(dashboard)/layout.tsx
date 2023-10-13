@@ -13,16 +13,13 @@ export default async function RootLayout({
 }) {
 
 
-/* const user = await data() */
 
 
 
   return (
     <div className="flex flex-col md:flex-row gap-2 w-full dark:text-white">
      
-     {/*  {!user && <ReditectPage/> }
-         */}
-
+   
         <NavbarDash/> 
 
       <main className=" py-3 flex-1 ">

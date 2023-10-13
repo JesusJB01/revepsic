@@ -17,14 +17,14 @@ export default function CustomCard({ title, imageSrc,  creationDate, slug}) {
       <CardBody className="overflow-visible py-2">
         <ImageNext
           alt="Card background"
-          className="object-cover rounded-xl dark:bg-violet-700"
+          className="object-cover rounded-xl dark:bg-white"
           src={imageSrc}
           width={270}
         />
       </CardBody>
       <CardFooter className="text-small justify-between">
             <Link href={ `/blog/${slug}` } className="mt-2 inline-block rounded-md bg-purple-600 px-6 py-3 text-white hover:bg-pink-600 dark:bg-purple-300 dark:text-black dark:hover:bg-pink-300" >
-            Read
+            Ver
             </Link>
           </CardFooter>
     </Card>

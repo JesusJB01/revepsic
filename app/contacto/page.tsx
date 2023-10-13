@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 
 import NextImage from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   const socialLinks = [
@@ -60,27 +61,20 @@ export default function Page() {
           />
         </div>
         <div className="flex flex-col pt-10 justify-center  md:pt-0 items-start md:ml-10">
-          <p className="text-justify pb-5 text-gray-600 font-bold ">Estaremos felices de contactarnos contigo.</p>
+          <p className="text-justify pb-5 text-gray-600 dark:text-white font-bold ">Estaremos felices de contactarnos contigo.</p>
           {socialLinks.map((social, index) => (
             <div
               key={index}
-              className="flex gap-5 pt-2 items-center text-center text-white mb-3"
+              className="flex gap-5 pt-2 items-center text-center text-white mb-3 "
             >
               <div className="flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-md bg-purple-600 p-2 md:p-4 text-white shadow-md">
                 {social.icon}
               </div>
-              <div>
-                <p className="text-xs md:text-sm text-black font-semibold mb-1">
+              <div >
+                <Link href={social.link} className=" text-xs md:text-sm text-black hover:text-gray-300   dark:text-white dark:hover:text-gray-300 font-semibold mb-1">
                   {social.name}
-                </p>
-                <a
-                  href={social.link}
-                  className="text-blue-500 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Enlace ficticio a {social.name}
-                </a>
+                </Link>
+                
               </div>
             </div>
           ))}

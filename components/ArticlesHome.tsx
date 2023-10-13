@@ -47,13 +47,13 @@ export default async function ArticlesHome() {
           </h2>
           <Link
             href={"/"}
-            className="ml-4 mt-2 inline-block rounded-md bg-violet-600 px-2 py-2 text-base font-bold text-white hover:bg-violet-500 dark:bg-purple-300 dark:text-black dark:hover:bg-pink-300 md:px-6 md:py-3 md:text-lg"
+            className="ml-4 mt-2 inline-block rounded-md bg-slate-600 px-2 py-2 text-base font-bold text-white hover:bg-slate-800  md:px-6 md:py-3 md:text-lg"
           >
             Todas las Entradas
           </Link>
           <Link
             href={"/"}
-            className="ml-4 mt-2 inline-block rounded-md bg-violet-600 px-2 py-2 text-base font-bold text-white hover:bg-violet-500 dark:bg-purple-300 dark:text-black dark:hover:bg-pink-300 md:px-6 md:py-3 md:text-lg"
+            className="ml-4 mt-2 inline-block rounded-md bg-slate-600 px-2 py-2 text-base font-bold text-white hover:bg-slate-800   md:px-6 md:py-3 md:text-lg"
           >
             tags
           </Link>
@@ -63,7 +63,7 @@ export default async function ArticlesHome() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 container mx-auto px-10">
         <section className="w-full ">
           <ImageUi />
-          <span className="inline-block rounded bg-purple-600 px-3 py-1 text-xs font-medium uppercase tracking-tight text-white hover:bg-pink-600 my-5">
+          <span className="inline-block rounded bg-gray-300 px-3 py-1 text-xs font-medium uppercase tracking-tight text-black hover:bg-gray-400 my-5">
             Tag
           </span>
           <p className=" text-gray-400 ">TItulo</p>

@@ -23,74 +23,77 @@ export default function page() {
         </div>
       </header>
 
-      <div className="py-10">
-        <section className="container mx-auto flex justify-center px-10">
-          <p className="text-justify font-serif">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Eget
-            lorem dolor sed viverra ipsum nunc aliquet bibendum. Pulvinar
-            pellentesque habitant morbi tristique senectus et. Pellentesque eu
-            tincidunt tortor aliquam. Enim nunc faucibus a pellentesque sit amet
-            porttitor eget dolor. Orci porta non pulvinar neque laoreet
-            suspendisse interdum. In aliquam sem fringilla ut morbi tincidunt
-            augue. Adipiscing elit pellentesque habitant morbi tristique
-            senectus et netus et. Massa tempor nec feugiat nisl pretium.
-            Elementum integer enim neque volutpat. Nec sagittis aliquam
-            malesuada bibendum. Ultricies integer quis auctor elit sed. Aliquet
-            sagittis id consectetur purus ut faucibus pulvinar elementum
-            integer. Vel fringilla est ullamcorper eget nulla facilisi. Laoreet
-            suspendisse interdum consectetur libero id. Nisl suscipit adipiscing
-            bibendum est ultricies integer quis auctor. A condimentum vitae
-            sapien pellentesque habitant. Donec ultrices tincidunt arcu non
-            sodales neque sodales ut etiam. Elit duis tristique sollicitudin
-            nibh sit amet commodo nulla. Blandit volutpat maecenas volutpat
-            blandit aliquam etiam erat velit. Leo in vitae turpis massa sed
-            elementum tempus egestas sed. Quis imperdiet massa tincidunt nunc
-            pulvinar sapien et ligula. Sem nulla pharetra diam sit amet nisl
-            suscipit. Amet nisl purus in mollis nunc sed id semper. In
-            pellentesque massa placerat duis. Mattis nunc sed blandit libero.
-            Scelerisque in dictum non consectetur a erat nam at lectus.
-            Adipiscing elit duis tristique sollicitudin nibh sit amet. Netus et
-            malesuada fames ac turpis egestas maecenas pharetra convallis.
-            Cursus risus at ultrices mi tempus imperdiet nulla malesuada
-            pellentesque. Lectus vestibulum mattis ullamcorper velit sed
-            ullamcorper morbi. Tortor posuere ac ut consequat semper viverra
-            nam. Et ligula ullamcorper malesuada proin libero nunc consequat
-            interdum varius. Gravida arcu ac tortor dignissim convallis. Cursus
-            sit amet dictum sit amet justo. Neque laoreet suspendisse interdum
-            consectetur libero id faucibus. Amet aliquam id diam maecenas
-            ultricies mi eget mauris pharetra. Nec tincidunt praesent semper
-            feugiat nibh sed pulvinar. Et ultrices neque ornare aenean euismod
-            elementum nisi quis. Semper eget duis at tellus at urna condimentum
-            mattis pellentesque. Sem viverra aliquet eget sit amet tellus.
-            Convallis aenean et tortor at risus viverra adipiscing. Vitae purus
-            faucibus ornare suspendisse sed nisi lacus sed viverra. Nunc
-            scelerisque viverra mauris in aliquam sem fringilla ut morbi. Orci
-            nulla pellentesque dignissim enim sit amet venenatis. Et molestie ac
-            feugiat sed lectus vestibulum mattis ullamcorper. Egestas erat
-            imperdiet sed euismod nisi. Nulla at volutpat diam ut venenatis.
-            Pretium vulputate sapien nec sagittis aliquam malesuada. Id donec
-            ultrices tincidunt arcu non sodales neque sodales ut. Ultricies mi
-            quis hendrerit dolor magna eget est. Et ligula ullamcorper malesuada
-            proin libero nunc. Mauris nunc congue nisi vitae. Mollis nunc sed id
-            semper risus. Odio euismod lacinia at quis risus. Amet mauris
-            commodo quis imperdiet massa. A arcu cursus vitae congue mauris
-            rhoncus aenean vel elit. Facilisis mauris sit amet massa vitae.
-            Faucibus purus in massa tempor nec feugiat. Ultrices sagittis orci a
-            scelerisque purus semper. Quisque egestas diam in arcu cursus. Diam
-            volutpat commodo sed egestas egestas. Ut lectus arcu bibendum at
-            varius. Morbi tincidunt augue interdum velit euismod in. Adipiscing
-            vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Non
-            pulvinar neque laoreet suspendisse interdum consectetur libero id.
-            Iaculis at erat pellentesque adipiscing commodo elit at imperdiet
-            dui. Faucibus vitae aliquet nec ullamcorper sit amet risus. Ornare
-            lectus sit amet est placerat in egestas erat imperdiet. Massa tempor
-            nec feugiat nisl. Sem et tortor consequat id. Commodo sed egestas
-            egestas fringilla phasellus. Lacus laoreet non curabitur gravida
-            arcu ac tortor dignissim convallis. Nunc lobortis mattis aliquam
-            faucibus purus in. Tincidunt eget nullam non nisi est sit amet
-            facilisis magna. Ultricies lacus sed turpis tincidunt.
-          </p>
+      <div className="py-10 pb-20 ">
+        <section className="container mx-auto flex justify-center px-10 text-justify  ">
+          
+            <div className="max-w-2xl mx-auto flex flex-col gap-2">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-yellow-500 mb-6">
+                Acerca de Revepsic
+              </h1>
+              <p className="text-gray-600 mb-4 dark:text-white">
+                En Revepsic, creemos en la promoción y avance de la psicología
+                científica como un pilar fundamental para el bienestar de la
+                sociedad venezolana y, en última instancia, para el mundo
+                entero. Nuestra red se compone de apasionados profesionales de
+                la psicología que se han unido con el objetivo de compartir
+                conocimientos, fomentar la investigación, y difundir información
+                relevante que contribuya al crecimiento de esta disciplina
+                vital.
+              </p>
+
+              <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-4 dark:text-yellow-500">
+                Nuestra Misión
+              </h2>
+              <p className="text-gray-600 dark:text-white">
+                Nuestra misión es clara: fortalecer la psicología científica en
+                Venezuela y más allá, promoviendo la investigación rigurosa, la
+                educación de calidad y el acceso a recursos psicológicos
+                confiables. Creemos en el poder de la psicología para
+                transformar vidas y comunidades, y estamos comprometidos a hacer
+                una diferencia positiva en nuestra sociedad.
+              </p>
+
+              <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-4 dark:text-yellow-500">
+                Lo Que Nos Impulsa
+              </h2>
+              <p className="text-gray-600 dark:text-white">
+                En el corazón de Revepsic se encuentra nuestra pasión por la
+                psicología científica y su capacidad para abordar desafíos
+                humanos fundamentales. Nos impulsan los siguientes valores y
+                objetivos:
+              </p>
+
+              <ul className="list-disc list-inside text-gray-600 pl-6 mt-4 dark:text-white">
+                <li>Excelencia en Investigación</li>
+                <li>Educación Accesible</li>
+                <li>Comunidad Colaborativa</li>
+                <li>Ética y Responsabilidad Profesional</li>
+              </ul>
+
+              <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-4 dark:text-yellow-500">
+                Nuestra Visión para el Futuro
+              </h2>
+              <p className="text-gray-600 dark:text-white">
+                Visualizamos un futuro en el que la psicología científica sea un
+                recurso ampliamente disponible y respetado en Venezuela, donde
+                las personas puedan acceder a apoyo psicológico de calidad y
+                donde los profesionales de la psicología sean reconocidos por su
+                contribución al bienestar social.
+              </p>
+
+              <h2 className="text-2xl font-bold text-gray-800 mt-6 mb-4 dark:text-yellow-500">
+                Únete a Nuestra Comunidad
+              </h2>
+              <p className="text-gray-600 dark:text-white">
+                Si compartes nuestra pasión por la psicología científica y
+                nuestros valores, te invitamos a unirte a nuestra comunidad en
+                Revepsic. Juntos, podemos avanzar en la promoción de la
+                psicología científica y hacer una diferencia positiva en la
+                sociedad venezolana. Acompáñanos en esta emocionante jornada de
+                descubrimiento y crecimiento.
+              </p>
+            </div>
+          
         </section>
       </div>
     </div>

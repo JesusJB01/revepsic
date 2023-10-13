@@ -7,7 +7,7 @@ export default function ImageUi() {
   return (
     <div>
          <Image
-            className="w-full h-full bg-violet-700"
+            className="w-full h-full bg-white"
             as={NextImage}
             width={1200}
             height={1200}

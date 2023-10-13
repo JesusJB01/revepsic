@@ -2,7 +2,6 @@
 
 import {
   Navbar,
-  NavbarBrand,
   NavbarContent,
   NavbarItem,
   Link,
@@ -10,13 +9,26 @@ import {
   NavbarMenu,
   NavbarMenuItem,
 } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SwitchDarkMode from "./SwitchDarkMode";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import Image from "next/image";
 
 export default function NavMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [tema, setTema] = useState(false);
+
+  const { theme } = useTheme();
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (theme === "dark") {
+      setTema(true);
+    } else {
+      setTema(false);
+    }
+  });
 
   const menuItems = [
     { text: "Home", path: "/" },
@@ -36,9 +48,14 @@ export default function NavMenu() {
           className="sm:hidden"
         />
 
-        <NavbarBrand>
-          <p className="font-bold text-inherit">REVEPSIC</p>
-        </NavbarBrand>
+        <Image
+          src={tema === true ? "/logo.png" : "/logoblanco.png"}
+          width={200}
+          height={300}
+          quality={80}
+          priority={true}
+          alt="Logo revepsic"
+        />
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">

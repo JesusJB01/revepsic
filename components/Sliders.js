@@ -50,8 +50,8 @@ const Carousel = () => {
               <Image
                 src={item.image}
                 alt={item.alt}
-                width={1920}
-                height={1080}
+                width={1000}
+                height={1000}
                 
               />
               
