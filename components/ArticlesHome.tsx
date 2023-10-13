@@ -2,6 +2,7 @@ import Link from "next/link";
 import CustomCard from "./CardHome";
 import ImageUi from "./Image";
 
+export const dynamic = 'force-dynamic'
 
 
 
@@ -16,11 +17,10 @@ interface BlogEntry {
  
 
 export async function getData() {
-  const apiUrl = process.env.URL_VERCEL || "http://localhost:3000" ;
-  
+ /*  const apiUrl = process.env.URL_VERCEL; */ 
 
   try {
-    const response = await fetch(`${apiUrl}/api/blog`, {cache: "no-store"});
+    const response = await fetch("https://revepsic.vercel.app/api/blog",  {cache: "no-store"} );
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");
@@ -30,7 +30,7 @@ export async function getData() {
 
     return data;
   } catch (error) {
-    console.error("Error al obtener datos:", error);
+    console.error("Error al obtener datossssssssssss:", error);
     throw error; // Propaga el error para que pueda ser manejado más arriba si es necesario.
   }
 } 
@@ -64,7 +64,7 @@ export default async function ArticlesHome() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 container mx-auto px-10">
         <section className="w-full ">
-          <ImageUi />
+          <ImageUi /> 
           <span className="inline-block rounded bg-gray-300 px-3 py-1 text-xs font-medium uppercase tracking-tight text-black hover:bg-gray-400 my-5">
             Tag
           </span>

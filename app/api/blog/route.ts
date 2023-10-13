@@ -23,7 +23,7 @@ export async function GET() {
             console.error('Error al obtener datos de Supabase:', error);
             return NextResponse.json({ error: 'Error al obtener datos' });
         }
-
+            
         return NextResponse.json({ data });
     } catch (error) {
         console.error('Error inesperado:', error);
