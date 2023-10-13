@@ -4,11 +4,13 @@ import LogoutButton from '@/components/LogoutButton'
 import Link from 'next/link'
 import React from 'react'
 import { FaBook, FaNewspaper } from 'react-icons/fa'
-import { data } from '../app/(dashboard)/login/helpers'
 
 export default async function NavbarDash() {
 
-    const user = await data()
+
+  const user = true
+
+    /* const user = await data() */
 
   return (
      
@@ -18,6 +20,7 @@ export default async function NavbarDash() {
         {user ? (
           <div className="flex flex-wrap   md:flex-col items-center gap-4">
             <div>jesus</div>
+            
             <div className="flex gap-3 md:pt-5 md:flex-col md:gap-y-5">
               <Link href={"/admin"} className="flex gap-2 items-center">
                 <FaBook className="text-2xl md:text-base" />{" "}

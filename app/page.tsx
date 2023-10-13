@@ -2,9 +2,9 @@
 import Description from "@/components/Description";
 import Hero from "@/components/Hero";
 import Sliders from "@/components/Sliders";
-import ArticlesHome from "@/components/ArticlesHome";
 import { Divider } from "@nextui-org/react";
 import Newsletter from "@/components/Newsletter";
+import ArticlesHome from "@/components/ArticlesHome";
 
 
 export default function page() {
@@ -15,7 +15,7 @@ export default function page() {
     <Divider></Divider>
     <Newsletter/>
     {/* <Sliders/> */}
-     <ArticlesHome/> 
+   <ArticlesHome/>  
   </div>
   );
 }
