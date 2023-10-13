@@ -7,7 +7,8 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.1.12",
-    "@supabase/auth-helpers-nextjs": "latest",
+    "@supabase/auth-helpers-nextjs": "^0.8.1",
+    "@supabase/supabase-js": "^2.38.1",
     "autoprefixer": "10.4.14",
     "eslint-config-next": "^13.5.4",
     "framer-motion": "^10.16.4",
