@@ -11,7 +11,7 @@ export default function page() {
     <Hero/>
     <Description/>
     <Newsletter/>
-   <ArticlesHome/>  
+   {/* <ArticlesHome/>  */} 
   </div>
   );
 }
