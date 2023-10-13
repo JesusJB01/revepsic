@@ -16,7 +16,7 @@ interface BlogEntry {
  
 
 export async function getData() {
-  const apiUrl ="http://localhost:3000" || process.env.URL_VERCEL ;
+  const apiUrl = process.env.URL_VERCEL || "http://localhost:3000" ;
   
 
   try {
