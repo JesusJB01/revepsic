@@ -16,6 +16,7 @@ interface BlogEntry {
 
 export async function getData() {
   const apiUrl = process.env.URL_VERCEL || "http://localhost:3000";
+  
 
   try {
     const response = await fetch(`${apiUrl}/api/blog`, {cache: "no-store"});
