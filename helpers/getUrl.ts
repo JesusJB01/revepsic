@@ -1,2 +1,4 @@
 
-export const urlApi = process.env.URL_VERCEL || 'http://localhost:3000';
+export const urlApi = process.env.URL_VERCEL;
+
+console.log(urlApi);
