@@ -31,7 +31,7 @@ export default function Article({
       <p className="text-justify pb-4">{summary}</p>
       <div>
         <Link
-         href={"https://www.revepsic.com/blog/${slug}"}
+         href={`https://www.revepsic.com/blog/${slug}`}
           className="bg-violet-600 px-4 py-2 rounded-lg text-white"
         >
           Leer más
