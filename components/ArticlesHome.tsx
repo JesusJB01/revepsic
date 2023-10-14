@@ -17,12 +17,18 @@ interface BlogEntry {
  
 
 export async function getData() {
+
+  const api = process.env.URL_VERCEL || "http://localhost:3000";
+
+  if (!api) {
+   return null
+  }
  
   try {
-    const response = await fetch(`${process.env.URL_VERCEL}/api/blog`, { cache: "no-store" });
-
-
+    const response = await fetch(`${api}/api/blog`, { cache: "no-store" });
+    
     if (!response.ok) {
+      return null
       throw new Error("Error al obtener datos de la API");
     }
 
@@ -64,7 +70,7 @@ export default async function ArticlesHome() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 container mx-auto px-10">
         <section className="w-full ">
-          <ImageUi /> 
+           <ImageUi />  
           <span className="inline-block rounded bg-gray-300 px-3 py-1 text-xs font-medium uppercase tracking-tight text-black hover:bg-gray-400 my-5">
             Tag
           </span>

@@ -10,11 +10,15 @@ interface ArticleData {
 }
 
 export async function getData() {
-  try {
-    const response = await fetch(`${process.env.URL_VERCEL}/api/blog`,  {cache: "no-store"});
 
+  const api = process.env.URL_VERCEL || "http://localhost:3000";
+
+   try {
+    const response = await fetch(`${api}/api/blog`,  {cache: "no-store"});
+    
     if (!response.ok) {
-      throw new Error("Error al obtener datos de la API");
+      console.error("Error al obtener datos de la API");
+      return null;
     }
 
     const data = await response.json();
@@ -28,6 +32,14 @@ export async function getData() {
 
 export default async function Blog() {
   const data = await getData();
+
+  if (!data) {
+    return (
+      <div className="container mx-auto flex flex-col items-center justify-center px-10 py-20 dark:text-white">
+        <p>No se encontraron datos.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto flex justify-center">
