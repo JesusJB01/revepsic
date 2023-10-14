@@ -16,7 +16,7 @@ interface BlogEntry {
 }
  
 
-/* export async function getData() {
+export async function getData() {
  
   try {
     const response = await fetch("https://www.revepsic.com/api/blog",  {cache: "no-store"} );
@@ -33,11 +33,11 @@ interface BlogEntry {
     throw error; // Propaga el error para que pueda ser manejado más arriba si es necesario.
   }
 } 
- */
+
 export default async function ArticlesHome() {
- /*  const data = await getData();
+  const data = await getData();
   const ultimosArticulos: BlogEntry[] = data?.data.slice(-4) || [];
- */
+
   return (
     <div className="bg-gray-100 w-full pb-10 dark:bg-slate-500">
       <div className="container mx-auto flex py-8 px-10 sm:py-12 lg:py-16">
@@ -80,7 +80,7 @@ export default async function ArticlesHome() {
           </Link>
         </section>
 
-       {/*  
+        
         <section className="grid grid-cols-2 gap-x-3 gap-y-3">
           {ultimosArticulos.map((user) => (
             <CustomCard
@@ -91,7 +91,7 @@ export default async function ArticlesHome() {
               slug={user.slug}
             />
           ))}
-        </section> */} 
+        </section> 
       </div>
     </div>
   );

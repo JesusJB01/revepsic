@@ -6,10 +6,6 @@ import Link from "next/link";
 
 export default function Article({ title, imageSrc, summary, slug}: { title: string, imageSrc: string, summary: string, slug:string }) {
 
-
-
-  
-
     return (
       <div className="bg-white rounded-lg p-6 dark:text-black">
         <Image
@@ -22,7 +18,7 @@ export default function Article({ title, imageSrc, summary, slug}: { title: stri
         <h2 className="pt-4 pb-2 text-lg font-bold">{title}</h2>
         <p className="text-justify pb-4">{summary}</p>
         <div>
-        <Link href={ `https://revepsic-8uq11.vercel.app/blog/${slug}`} className="bg-violet-600 px-4 py-2 rounded-lg text-white">
+        <Link href={ `https://www.revepsic.com/blog/${slug}`} className="bg-violet-600 px-4 py-2 rounded-lg text-white">
     Leer más
   </Link>
         </div>
