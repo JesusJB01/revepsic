@@ -9,7 +9,8 @@ async function getData() {
     const response = await fetch(`${apiUrl}/api/blog`);
 
     if (!response) {
-      throw new Error("Error al obtener datos de la API");
+      console.log("Error al obtener datos de la API");
+      return null;
     }
 
     const data = await response.json();
