@@ -20,7 +20,7 @@ export async function getData() {
  /*  const apiUrl = process.env.URL_VERCEL; */ 
 
   try {
-    const response = await fetch("https://revepsic.vercel.app/api/blog",  {cache: "no-store"} );
+    const response = await fetch("https://project-revepsic-6ikhh3cju-jesusjb01.vercel.app/api/blog",  {cache: "no-store"} );
 
     if (!response.ok) {
       throw new Error("Error al obtener datos de la API");
