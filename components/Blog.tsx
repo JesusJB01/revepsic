@@ -11,7 +11,7 @@ interface ArticleData {
 
 export async function getData() {
 
-  const api = process.env.URL_VERCEL || "http://localhost:3000";
+  const api = process.env.URL_VERCEL;
 
    try {
     const response = await fetch(`${api}/api/blog`,  {cache: "no-store"});

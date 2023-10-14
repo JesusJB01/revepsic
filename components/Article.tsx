@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Article({ title, imageSrc, summary, slug}: { title: string, imageSrc: string, summary: string, slug:string }) {
 
-  const api = process.env.URL_VERCEL || "http://localhost:3000";
+  const api = process.env.URL_VERCEL 
 
   if (!api) {
    return null
