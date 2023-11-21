@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Article from "./Article";
 import ImagesComponent from "./ImagesComponent";
+import JustArticle from "./JustoArticle";
 
 interface ArticleData {
   title: string;
@@ -10,12 +11,11 @@ interface ArticleData {
 }
 
 export async function getData() {
-
   const api = process.env.URL_VERCEL;
 
-   try {
-    const response = await fetch(`${api}/api/blog`,  {cache: "no-store"});
-    
+  try {
+    const response = await fetch(`${api}/api/blog`, { cache: "no-store" });
+
     if (!response.ok) {
       console.error("Error al obtener datos de la API");
       return null;
@@ -51,25 +51,28 @@ export default async function Blog() {
 
           <div className="flex flex-col justify-center items-center pt-10">
             <div className="flex flex-col p-6 justify-center  gap-5 md:flex-row">
-              <ImagesComponent
-                width={700}
-                height={700}
-                src="/blog.jpg"
-                alt="NextUI hero Image"
-              />
+              <div className="bg-gray-200 p-10 rounded-lg">
+                <ImagesComponent
+                  width={500}
+                  height={500}
+                  src="/pich.svg"
+                  alt="NextUI hero Image"
+                />
+              </div>
               <div className="flex flex-col md:w-[40%]">
                 <h2 className="pb-5 text-start font-bold">
-                  Título del Articulo
+                  Revepsic estara Prensente en el IV congreso Venezolano de
+                  Psicologia
                 </h2>
-                <p className="text-justify pb-10">
-                  Nemo vel ad consectetur namut rutrum ex, venenatis
-                  sollicitudin urna. Aliquam erat volutpat. Integer eu ipsum
-                  sem. Ut bibendum lacus vestibulum maximus suscipit. Quisque
-                  vitae nibh iaculis neque blan
+                <p className="text-justify  pb-10">
+                 REVEPSIC presentará una mesa de trabajo sobre <br />
+                  <strong>
+                  Psicología Basada en Evidencia: Promoviendo la Práctica  Psicológica Fundamentada
+                  </strong>
                 </p>
                 <div>
                   <Link
-                    href={"/"}
+                    href={"/ponencia"}
                     className="bg-violet-600 text-white p-3 rounded-lg"
                   >
                     Leer mas
@@ -79,8 +82,8 @@ export default async function Blog() {
             </div>
 
             {/* Articulos */}
-              <div className="grid grid-cols-1 pt-20 gap-10 md:grid-cols-3">
-              {data.data.map((article: ArticleData, index:number) => (
+            <div className="grid grid-cols-1 pt-20 gap-10 md:grid-cols-3">
+              {/* {data.data.map((article: ArticleData, index:number) => (
                 <Article
                   key={index}
                   title={article.title}
@@ -89,8 +92,10 @@ export default async function Blog() {
                   slug={article.slug}                 
                   
                 />
-              ))}
-            </div> 
+              ))} */}
+
+              <JustArticle/>
+            </div>
           </div>
         </div>
       </section>

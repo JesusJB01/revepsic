@@ -6,28 +6,44 @@ import NextImage from "next/image";
 
 const Team = [
   {
-    name: "John Doe",
+    name: "Alejandro Becerra",
+    position: "Presidente",
+    src: "/alejandro.jpg"
+  },
+  {
+    name: "Jesus Jimenez",
+    position: "Vicepresidente",
+     src: "/jesus.jpg"
+  },
+  {
+    name: "Adonis Solis",
+    position: "Secretaria",
+     src: "/adonis.jpg"
+  },
+  {
+    name: "Maria Perez",
     position: "CEO",
+     src: "/maria.jpg"
   },
   {
-    name: "Jane Smith",
+    name: "Robert Polanco",
     position: "Designer",
+     src: "/.jpg"
   },
   {
-    name: "Bob Johnson",
+    name: "Nelson Ledezma",
     position: "Developer",
+     src: "/nelson.jpg"
   },
   {
-    name: "John Doe",
-    position: "CEO",
-  },
-  {
-    name: "Jane Smith",
-    position: "Designer",
-  },
-  {
-    name: "Bob Johnson",
+    name: "Luis Madera",
     position: "Developer",
+    src: "/luismadera.jpg"
+  },
+  {
+    name: "Jhonnathan Sulbaran",
+    position: "Developer",
+     src: "/jonnathansulbaran.jpg"
   },
   
 ];
@@ -61,10 +77,10 @@ export default function Page() {
       <Avatar
         size="lg"
         isBordered
-        src={`https://i.pravatar.cc/150?u=a042581f4e29026024d${index}`}
+        src={user.src}
       />
       <p className="text-center text-lg font-semibold">{user.name}</p>
-      <p className="text-center text-gray-500">{user.position}</p>
+      {/* <p className="text-center text-gray-500">{user.position}</p> */}
     </div>
   ))}
 </div>

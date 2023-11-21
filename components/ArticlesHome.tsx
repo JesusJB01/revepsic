@@ -1,10 +1,8 @@
 import Link from "next/link";
-import CustomCard from "./CardHome";
 import ImageUi from "./Image";
+import OneCard from "../components/OneCard"
 
-export const dynamic = 'force-dynamic'
-
-
+export const dynamic = "force-dynamic";
 
 interface BlogEntry {
   id: number;
@@ -14,21 +12,19 @@ interface BlogEntry {
   content: string;
   slug: string;
 }
- 
 
 export async function getData() {
-
   const api = process.env.URL_VERCEL || "http://localhost:3000";
 
   if (!api) {
-   return null
+    return null;
   }
- 
+
   try {
     const response = await fetch(`${api}/api/blog`, { cache: "no-store" });
-    
+
     if (!response.ok) {
-      return null
+      return null;
       throw new Error("Error al obtener datos de la API");
     }
 
@@ -39,11 +35,13 @@ export async function getData() {
     console.error("Error al obtener datossssssssssss:", error);
     throw error; // Propaga el error para que pueda ser manejado más arriba si es necesario.
   }
-} 
+}
 
 export default async function ArticlesHome() {
-  const data = await getData();
-  const ultimosArticulos: BlogEntry[] = data?.data.slice(-4) || [];
+  // const data = await getData();
+
+  // console.log(data)
+  // const ultimosArticulos: BlogEntry[] = data?.data.slice(-4) || [];
 
   return (
     <div className="bg-gray-100 w-full pb-10 dark:bg-slate-500">
@@ -70,26 +68,34 @@ export default async function ArticlesHome() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 container mx-auto px-10">
         <section className="w-full ">
-           <ImageUi />  
+          <ImageUi />
           <span className="inline-block rounded bg-gray-300 px-3 py-1 text-xs font-medium uppercase tracking-tight text-black hover:bg-gray-400 my-5">
-            Tag
+            Psicologia Basada en Evidencia
           </span>
-          <p className=" text-gray-400 ">TItulo</p>
-          <span className="mb-5 text-gray-600 dark:text-gray-400">Fecha</span>
-          <p className="mb-4 text-gray-600 dark:text-gray-400">
-            Texto descriptivo del articulo
+          <p className=" text-black font-bold dark:text-white">
+            Revepsic presente en el IV Congreso Venezolano de Psicología
+          </p>
+          <span className="pt-9 text-gray-600 dark:text-gray-400">
+            21/11/2023
+          </span>
+          <p className="mb-4 text-black font-medium dark:text-white">
+            La Red Venezolana para el Avance de la Psicología Científica
+            (REVEPSIC) presentará una mesa de trabajo sobre &quot;Psicología
+            Basada en Evidencia: Promoviendo la Práctica Psicológica
+            Fundamentada&quot; en el IV Congreso Venezolano de Psicología: La
+            Salud Mental, un camino para el buen vivir, dicha actividad se
+            llevará a cabo el próximo 23 de noviembre a las 2:30
           </p>
           <Link
-            href={"/"}
+            href={"/ponencia"}
             className="mt-2 inline-block rounded-md bg-purple-600 px-6 py-3 text-white hover:bg-pink-600 dark:bg-purple-300 dark:text-black dark:hover:bg-pink-300"
           >
             Leer mas
           </Link>
         </section>
 
-        
         <section className="grid grid-cols-2 gap-x-3 gap-y-3">
-          {ultimosArticulos.map((user) => (
+          {/* {ultimosArticulos.map((user) => (
             <CustomCard
               key={user.id}
               title={user.title}
@@ -97,8 +103,11 @@ export default async function ArticlesHome() {
               creationDate={user.created_at}
               slug={user.slug}
             />
-          ))}
-        </section> 
+          ))} */}
+
+          {/* <OneCard/> */}
+            
+        </section>
       </div>
     </div>
   );

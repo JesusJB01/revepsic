@@ -11,7 +11,7 @@ export default function ImageUi() {
             as={NextImage}
             width={1200}
             height={1200}
-            src="/imageHome.svg"
+            src="/flyerRevepsic.png"
             alt="Imagen de referencia"
           />
     </div>

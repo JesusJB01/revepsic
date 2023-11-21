@@ -5,6 +5,7 @@ import {
   FaFacebook,
   FaInstagram,
   FaTelegram,
+  FaTwitter,
 } from "react-icons/fa";
 
 import NextImage from "next/image";
@@ -12,25 +13,25 @@ import Link from "next/link";
 
 export default function Page() {
   const socialLinks = [
-    {
-      name: "Gmail",
-      icon: <FaEnvelope />,
-      link: "#", // Enlace ficticio a Gmail
-    },
+    // {
+    //   name: "Gmail",
+    //   icon: <FaEnvelope />,
+    //   link: "", // Enlace ficticio a Gmail
+    // },
     {
       name: "Facebook",
       icon: <FaFacebook />,
-      link: "#", // Enlace ficticio a Facebook
+      link: "https://www.facebook.com/profile.php?id=100063495787504", // Enlace ficticio a Facebook
     },
     {
       name: "Instagram",
       icon: <FaInstagram />,
-      link: "#", // Enlace ficticio a Instagram
+      link: "https://www.instagram.com/revepsic/?utm_source=ig_web_button_share_sheet&igshid=OGQ5ZDc2ODk2ZA==", // Enlace ficticio a Instagram
     },
     {
-      name: "Telegram",
-      icon: <FaTelegram />,
-      link: "#", // Enlace ficticio a Telegram
+      name: "Twitter",
+      icon: <FaTwitter />,
+      link: "https://twitter.com/REVEPSIC", // Enlace ficticio a Telegram
     },
   ];
 
@@ -71,7 +72,7 @@ export default function Page() {
                 {social.icon}
               </div>
               <div >
-                <Link href={social.link} className=" text-xs md:text-sm text-black hover:text-gray-300   dark:text-white dark:hover:text-gray-300 font-semibold mb-1">
+                <Link href={social.link}  className=" text-xs md:text-sm text-black hover:text-gray-300   dark:text-white dark:hover:text-gray-300 font-semibold mb-1">
                   {social.name}
                 </Link>
                 
