@@ -22,7 +22,7 @@ export default function JustArticle( ) {
       <p className="text-justify text-base pb-4 whitespace-normal"> La PBE emerge como una guía fundamental para comprender y abordar desafíos cotidianos.</p>
       <div>
         <Link
-         href={`https://www.revepsic.com/blog/articulo`}
+         href={"https://www.revepsic.com/articulo"}
           className="bg-violet-600 px-4 py-2 rounded-lg text-white"
         >
           Leer más
