@@ -8,7 +8,7 @@ const Team = [
   {
     name: "Alejandro Becerra",
     position: "Presidente",
-    src: "/alejandro.jpg"
+    src: "/alejandrobecerra.png"
   },
   {
     name: "Jesus Jimenez",
@@ -45,6 +45,21 @@ const Team = [
     position: "Developer",
      src: "/jonnathansulbaran.jpg"
   },
+  {
+    name: "Wilfredo Diaz",
+    position: "Developer",
+     src: "/wilfredodiaz.jpg"
+  },
+  {
+    name: "Ana Rodriguez",
+    position: "Developer",
+     src: "/anarodriguez.jpg"
+  },
+  {
+    name: "Lady Molina",
+    position: "Developer",
+     src: "/lady.jpg"
+  },
   
 ];
 
@@ -78,6 +93,7 @@ export default function Page() {
         size="lg"
         isBordered
         src={user.src}
+        
       />
       <p className="text-center text-lg font-semibold">{user.name}</p>
       {/* <p className="text-center text-gray-500">{user.position}</p> */}
