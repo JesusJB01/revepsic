@@ -1,21 +1,107 @@
+"use client"
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-export default function Newsletter() {
+
+const Newsletter = () => {
+ // Supabase configuration
+ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+ const supabase = createClient(supabaseUrl, supabaseKey);
+
+ // Component state
+ const [email, setEmail] = useState('');
+ const [error, setError] = useState('');
+ const [registro, setRegistro] = useState('');
+
+
+ // Event handler for input changes
+ const handleInputChange = (e) => {
+   setEmail(e.target.value);
+   setError("")
+ };
+
+ // Function to validate email format
+ const isEmailValid = (email) => {
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   return emailRegex.test(email);
+ };
+
+ // Event handler for form submission
+ const handleSubmit = async (e) => {
+   e.preventDefault();
+
+   // Validate email format
+   if (!isEmailValid(email)) {
+     setError('Ingrese un correo electrónico válido.');
+     return;
+   }
+
+   try {
+     // Check if email already exists in Supabase
+     const { data: existingEmails, error: emailError } = await supabase.from('email').select('email').eq('email', email);
+
+     if (emailError) {
+       throw new Error(emailError.message);
+     }
+
+     if (existingEmails.length > 0) {
+      setError('Este correo electrónico ya está registrado.');
+       return;
+     }
+
+     // Insert email into Supabase
+     const { data, error } = await supabase.from('email').insert([{ email }]).select();
+
+     if (error) {
+       throw new Error(error.message);
+     }
+
+     // Clear the input field and show success message
+     setEmail('');
+     setRegistro('¡Registro exitoso!');
+
+     // Set a timeout to clear the messages after 3 seconds
+    setTimeout(() => {
+      
+      setRegistro('');
+    }, 3000);
+
+   } catch (error) {
+     console.error('Error submitting form:', error.message);
+   }
+ };
+
   return (
     <section className="w-full h-2/3 py-12 md:py-16 lg:py-20 xl:py-24 overflow-hidden bg-gray-900">
       <div className="container mx-auto px-10">
         <div className="flex flex-wrap -mx-4 items-center">
           <div className="w-full lg:w-1/2 px-4 mb-4 lg:mb-0">
             <div className="max-w-lg mx-auto">
-              <h4 className="text-3xl sm:text-4xl lg:text-5xl text-white font-bold mb-6 md:mb-8">Registrate al newsletter</h4>
+              <h4 className="text-3xl sm:text-4xl lg:text-5xl text-white font-bold mb-6 md:mb-8">Regístrate al newsletter</h4>
               <div className="mb-8">
-                <div className="text-gray-400">Manténgase informado con todo lo que necesita saber en Psicologia.</div>
+                <div className="text-gray-400">Mantente informado con todo lo que necesitas saber en Psicología.</div>
               </div>
-              <div className="sm:flex mb-4 items-center">
-                <input className="w-full mb-3 sm:mb-0 sm:mr-4 py-3 px-4 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-purple-500 focus:outline-purple rounded-lg" type="email" placeholder="correo@correo.com" />
-                <button className="inline-block w-full sm:w-auto py-3 px-5 text-sm font-semibold text-white hover:text-gray-300 bg-slate-500 rounded-md overflow-hidden transition duration-300" type="submit">
+              {error && <p className="text-white text-center text-sm bg-red-500 rounded-lg mb-5 p-3">{error}</p>}
+              {registro && <p className="text-white text-center text-sm bg-green-500 rounded-lg mb-5 p-3">{registro}</p>}
+              <div className="sm:flex mb-4 items-center ">
+                <input
+                  className={`w-full mb-3 sm:mb-0 sm:mr-4 py-3 px-4 text-sm text-gray-900 placeholder-gray-400 border ${
+                    error ? 'border-red-500' : 'border-gray-200'
+                  } focus:border-purple-500 focus:outline-purple rounded-lg`}
+                  type="email"
+                  placeholder="correo@correo.com"
+                  value={email}
+                  onChange={handleInputChange}
+                />
+                
+                <button
+                  className="inline-block w-full sm:w-auto py-3 px-5 text-sm font-semibold text-white hover:text-gray-300 bg-slate-500 rounded-md overflow-hidden transition duration-300"
+                  type="submit"
+                  onClick={handleSubmit}
+                >
                   <div className="group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
                   <div className="flex items-center justify-center">
                     <span className="mr-2">Subscribe</span>
@@ -45,4 +131,6 @@ export default function Newsletter() {
       </div>
     </section>
   );
-}
+};
+
+export default Newsletter;
