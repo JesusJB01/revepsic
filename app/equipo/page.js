@@ -26,11 +26,6 @@ const Team = [
      src: "/maria.jpg"
   },
   {
-    name: "Robert Polanco",
-    position: "Designer",
-     src: "/.jpg"
-  },
-  {
     name: "Nelson Ledezma",
     position: "Developer",
      src: "/nelson.jpg"
