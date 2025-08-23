@@ -18,7 +18,7 @@ export default function Page() {
             />
             <div className="absolute bottom-0 left-0 z-20 p-4">
               <h2 className="text-xl font-bold italic text-purple-300">
-                Inscripción JVPBE 2025
+                Postulación JVPBE 2025
               </h2>
             </div>
           </div>
@@ -28,11 +28,22 @@ export default function Page() {
       {/* MAIN CONTENT */}
       <div className="max-w-4xl mx-auto p-8">
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-yellow-500">
-          Jornada Científica en Psicología Capítulo Caracas
+          Jornada Venezolana de Psicología Basada en Evidencia
         </h1>
         <h2 className="text-xl font-semibold text-center mb-8 text-gray-700 dark:text-gray-300">
           Inscripción y Postulación de Trabajos
         </h2>
+
+<div>
+          <NextImage
+              width={1000}
+              height={1000}
+              src="/flyer.jpg"
+              alt="Jornada Científica"
+              className="p-1 mt-2 rounded-lg"
+            />
+        </div>
+
 
         {/* INSTRUCCIONES */}
         <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow mb-8">
@@ -103,6 +114,8 @@ export default function Page() {
             </li>
           </ul>
         </div>
+
+        
       </div>
     </div>
   );
