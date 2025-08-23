@@ -36,6 +36,7 @@ export default function NavMenu() {
     { text: "Contacto", path: "/contacto" },
     { text: "Team", path: "/equipo" },
     { text: "Blog", path: "/blog" },
+    { text: "Congreso", path: "/postulacion" },
   ];
   return (
     <Navbar
