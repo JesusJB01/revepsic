@@ -1,6 +1,37 @@
-"use client";
+
 import React from "react";
 import NextImage from "next/image";
+
+
+export const metadata = {
+  title: "Jornada Venezolana de Psicología Basada en Evidencia 2025",
+  description:
+    "Inscripción y postulación de trabajos para la 2da Jornada Venezolana de Psicología Basada en Evidencia 2025. Envía tu síntesis curricular y participa.",
+  keywords: [
+    "Psicología",
+    "Psicología Basada en Evidencia",
+    "Jornada Científica",
+    "Investigación",
+    "Venezuela",
+  ],
+  openGraph: {
+    title: "JVPBE 2025 - Postulación",
+    description:
+      "Participa en la 2da Jornada Venezolana de Psicología Basada en Evidencia 2025.",
+    url: "https://www.revepsic.com/postulacion",
+    siteName: "JVPBE",
+    images: [
+      {
+        url: "https://www.revepsic.com/flyer.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Jornada Científica",
+      },
+    ],
+    locale: "es_ES",
+    type: "website",
+  },
+};
 
 export default function Page() {
   return (
