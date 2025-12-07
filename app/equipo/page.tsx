@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
-import { Avatar } from "@nextui-org/react";
+// import { Avatar } from "@nextui-org/react";
 import NextImage from "next/image";
-
 
 const Team = [
   {
@@ -13,22 +12,22 @@ const Team = [
   {
     name: "Jesus Jimenez",
     position: "Vicepresidente",
-     src: "/jesus.jpg"
+    src: "/jesus.jpg"
   },
   {
     name: "Adonis Solis",
     position: "Secretaria",
-     src: "/adonis.jpg"
+    src: "/adonis.jpg"
   },
   {
     name: "Maria Perez",
     position: "CEO",
-     src: "/maria.jpg"
+    src: "/maria.jpg"
   },
   {
     name: "Nelson Ledezma",
     position: "Developer",
-     src: "/nelson.jpg"
+    src: "/nelson.jpg"
   },
   {
     name: "Luis Madera",
@@ -38,24 +37,24 @@ const Team = [
   {
     name: "Jhonnathan Sulbaran",
     position: "Developer",
-     src: "/jonnathansulbaran.jpg"
+    src: "/jonnathansulbaran.jpg"
   },
   {
     name: "Wilfredo Diaz",
     position: "Developer",
-     src: "/wilfredodiaz.jpg"
+    src: "/wilfredodiaz.jpg"
   },
   {
     name: "Ana Rodriguez",
     position: "Developer",
-     src: "/anarodriguez.jpg"
+    src: "/anarodriguez.jpg"
   },
   {
     name: "Lady Molina",
     position: "Developer",
-     src: "/lady.jpg"
+    src: "/lady.jpg"
   },
-  
+
 ];
 
 
@@ -82,19 +81,21 @@ export default function Page() {
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 pb-52 pt-20 container mx-auto">
-  {Team.map((user, index) => (
-    <div key={index} className="flex flex-col items-center">
-      <Avatar
-        size="lg"
-        isBordered
-        src={user.src}
-        
-      />
-      <p className="text-center text-lg font-semibold">{user.name}</p>
-      {/* <p className="text-center text-gray-500">{user.position}</p> */}
-    </div>
-  ))}
-</div>
+        {Team.map((user, index) => (
+          <div key={index} className="flex flex-col items-center gap-4">
+            <div className="relative w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-full border-2 border-gray-200">
+              <NextImage
+                src={user.src}
+                alt={user.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <p className="text-center text-lg font-semibold">{user.name}</p>
+            {/* <p className="text-center text-gray-500">{user.position}</p> */}
+          </div>
+        ))}
+      </div>
 
     </div>
   );

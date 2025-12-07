@@ -1,6 +1,5 @@
 "use client"
 import React from 'react'
-import {Card, CardHeader, CardBody, Divider} from "@nextui-org/react"
 import { FaFlask, FaBook, FaGraduationCap, FaHandsHelping, FaUserShield, FaGavel } from 'react-icons/fa';
 
 const caracteristicas = [
@@ -12,7 +11,7 @@ const caracteristicas = [
   {
     titulo: "Difusión del conocimiento",
     descripcion: "Facilitamos la difusión de conocimientos y descubrimientos en psicología mediante la publicación de revistas científicas, organización de conferencias y simposios. Aquí es donde los profesionales y académicos comparten sus investigaciones y avances con la comunidad.",
-    icono: <FaBook size="2rem" color="violet"/>
+    icono: <FaBook size="2rem" color="violet" />
   },
   {
     titulo: "Formación y educación",
@@ -37,25 +36,25 @@ const caracteristicas = [
 ];
 
 export default function Description() {
-    return (
-        <div className='bg-gray-100 flex  justify-center w-full px-10 py-20 dark:bg-slate-500'>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {caracteristicas.map((caracteristica, index) => (
-              <Card className="max-w-[400px]" key={index}>
-                <CardHeader className="flex gap-3">
-                  {caracteristica.icono}
-                  <div className="flex flex-col">
-                    <p className="text-base text-black dark:text-white font-medium ">{caracteristica.titulo}</p>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className='text-justify text-gray-400 text-sm tracking-tighter '>{caracteristica.descripcion}</p>
-                </CardBody>
-              </Card>
-            ))}
+  return (
+    <div className='bg-gray-100 flex  justify-center w-full px-10 py-20 dark:bg-slate-500'>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        {caracteristicas.map((caracteristica, index) => (
+          <div className="max-w-[400px] rounded-xl border bg-card text-card-foreground shadow bg-white dark:bg-slate-800 p-6" key={index}>
+            <div className="flex gap-3 mb-4 items-center">
+              {caracteristica.icono}
+              <div className="flex flex-col">
+                <p className="text-base text-black dark:text-white font-medium ">{caracteristica.titulo}</p>
+              </div>
+            </div>
+            <div className="h-px bg-gray-200 dark:bg-gray-700 my-4" />
+            <div className="py-2">
+              <p className='text-justify text-gray-500 dark:text-gray-300 text-sm tracking-tighter '>{caracteristica.descripcion}</p>
+            </div>
           </div>
-        </div>
-      );
+        ))}
+      </div>
+    </div>
+  );
 }

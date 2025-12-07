@@ -1,32 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {useTheme} from "next-themes";
-import {Switch} from "@nextui-org/react";
-import {MoonIcon} from "./MoonIcon";
-import {SunIcon} from "./SunIcon";
+import React from "react";
+import { useTheme } from "next-themes";
+// TODO: Replace with shadcn/ui button/dropdown later
+import { Moon, Sun } from "lucide-react";
 
 export default function SwitchDarkMode() {
+  const { theme, setTheme } = useTheme();
 
-  const {theme, setTheme} = useTheme();
- 
- 
   return (
-    <Switch
-    onClick={() => setTheme(theme === "dark" ? "light" : "dark" )}
-      size="lg"
-      color="warning"
-      thumbIcon={({ isSelected, className }) =>
-        isSelected ? (
-          <SunIcon className={className} />
-        ) : (
-          <MoonIcon className={className} />
-        )
-      }
-    />
-    
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="p-2 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+      aria-label="Toggle Theme"
+    >
+      {theme === "dark" ? (
+         <Sun className="h-5 w-5" />
+      ) : (
+         <Moon className="h-5 w-5" />
+      )}
+    </button>
   );
 }
-
-
-

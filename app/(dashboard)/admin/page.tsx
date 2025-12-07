@@ -1,34 +1,8 @@
-import React from "react";
-
-import Text from "@/components/Text";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-
-export const dynamic = "force-dynamic";
-
-export default async function Index() {
-
-  const supabase = createServerComponentClient({ cookies });
-
-  // Obtenemos la información del usuario
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+export default function AdminPlaceholder() {
   return (
-    <>
-      {/* Contenido principal */}
-      <div className=" ">
-        {user ? (
-          <div className="w-full flex flex-col items-center pt-24 text-black">
-            <Text />
-          </div>
-        ) : (
-          <div className="w-full flex flex-col items-center text-black">
-            Inicia sesión para ver el contenido
-          </div>
-        )}
-      </div>
-    </>
+    <div className="p-10 text-center">
+      <h1 className="text-2xl font-bold">Panel de Administración</h1>
+      <p>TODO: Migrar a nuevo sistema con Prisma y API Express.</p>
+    </div>
   );
 }

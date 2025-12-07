@@ -2,77 +2,60 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 
 
 const Newsletter = () => {
- // Supabase configuration
- const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
- const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
- const supabase = createClient(supabaseUrl, supabaseKey);
+  // Supabase configuration
+  // const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // const supabase = createClient(supabaseUrl, supabaseKey);
 
- // Component state
- const [email, setEmail] = useState('');
- const [error, setError] = useState('');
- const [registro, setRegistro] = useState('');
+  // Component state
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [registro, setRegistro] = useState('');
 
 
- // Event handler for input changes
- const handleInputChange = (e) => {
-   setEmail(e.target.value);
-   setError("")
- };
+  // Event handler for input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setError("")
+  };
 
- // Function to validate email format
- const isEmailValid = (email) => {
-   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-   return emailRegex.test(email);
- };
+  // Function to validate email format
+  const isEmailValid = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
- // Event handler for form submission
- const handleSubmit = async (e) => {
-   e.preventDefault();
+  // Event handler for form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-   // Validate email format
-   if (!isEmailValid(email)) {
-     setError('Ingrese un correo electrónico válido.');
-     return;
-   }
+    // Validate email format
+    if (!isEmailValid(email)) {
+      setError('Ingrese un correo electrónico válido.');
+      return;
+    }
 
-   try {
-     // Check if email already exists in Supabase
-     const { data: existingEmails, error: emailError } = await supabase.from('email').select('email').eq('email', email);
+    try {
+      // TODO: Connect to backend API
+      console.log('TODO: Submit email to API:', email);
 
-     if (emailError) {
-       throw new Error(emailError.message);
-     }
+      // Clear the input field and show success message
+      setEmail('');
+      setRegistro('¡Registro exitoso! (Simulado)');
 
-     if (existingEmails.length > 0) {
-      setError('Este correo electrónico ya está registrado.');
-       return;
-     }
+      // Set a timeout to clear the messages after 3 seconds
+      setTimeout(() => {
+        setRegistro('');
+      }, 3000);
 
-     // Insert email into Supabase
-     const { data, error } = await supabase.from('email').insert([{ email }]).select();
-
-     if (error) {
-       throw new Error(error.message);
-     }
-
-     // Clear the input field and show success message
-     setEmail('');
-     setRegistro('¡Registro exitoso!');
-
-     // Set a timeout to clear the messages after 3 seconds
-    setTimeout(() => {
-      
-      setRegistro('');
-    }, 3000);
-
-   } catch (error) {
-     console.error('Error submitting form:', error.message);
-   }
- };
+    } catch (error: any) {
+      console.error('Error submitting form:', error?.message);
+    }
+  };
 
   return (
     <section className="w-full h-2/3 py-12 md:py-16 lg:py-20 xl:py-24 overflow-hidden bg-gray-900">
@@ -88,15 +71,14 @@ const Newsletter = () => {
               {registro && <p className="text-white text-center text-sm bg-green-500 rounded-lg mb-5 p-3">{registro}</p>}
               <div className="sm:flex mb-4 items-center ">
                 <input
-                  className={`w-full mb-3 sm:mb-0 sm:mr-4 py-3 px-4 text-sm text-gray-900 placeholder-gray-400 border ${
-                    error ? 'border-red-500' : 'border-gray-200'
-                  } focus:border-purple-500 focus:outline-purple rounded-lg`}
+                  className={`w-full mb-3 sm:mb-0 sm:mr-4 py-3 px-4 text-sm text-gray-900 placeholder-gray-400 border ${error ? 'border-red-500' : 'border-gray-200'
+                    } focus:border-purple-500 focus:outline-purple rounded-lg`}
                   type="email"
                   placeholder="correo@correo.com"
                   value={email}
                   onChange={handleInputChange}
                 />
-                
+
                 <button
                   className="inline-block w-full sm:w-auto py-3 px-5 text-sm font-semibold text-white hover:text-gray-300 bg-slate-500 rounded-md overflow-hidden transition duration-300"
                   type="submit"
