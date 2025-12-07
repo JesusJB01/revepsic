@@ -1,11 +1,25 @@
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import { AuthProvider } from "@/components/auth/AuthProvider"
 
 export const metadata = {
   title: 'REVEPSIC - Red Venezolana Para el Avance de la Psicología Científica',
   description: 'Explora la ciencia detrás de la mente en nuestro blog de divulgación psicológica. Descubre investigaciones, tendencias y enfoques innovadores de expertos en psicología.',
+  keywords: ['psicología', 'psicología científica', 'Venezuela', 'investigación', 'evidencia'],
+  authors: [{ name: 'REVEPSIC' }],
+  openGraph: {
+    title: 'REVEPSIC - Red Venezolana Para el Avance de la Psicología Científica',
+    description: 'Líderes en la difusión y divulgación de la psicología basada en evidencia en Venezuela.',
+    url: 'https://www.revepsic.com',
+    siteName: 'REVEPSIC',
+    locale: 'es_VE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'REVEPSIC',
+    description: 'Red Venezolana Para el Avance de la Psicología Científica',
+  },
 }
 
 export default function RootLayout({
@@ -15,22 +29,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased transition-theme">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          <div className="relative flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </ThemeProvider>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange={false}
+          >
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )
 }
+
+
+

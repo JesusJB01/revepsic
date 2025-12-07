@@ -1,16 +1,29 @@
 import React from "react";
 import Image from "next/image";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ShareButtons from "@/components/ShareButtons";
 
 export default function ArticuloPage() {
   return (
     <article className="py-16 md:py-24">
       <div className="container max-w-3xl">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: "Blog", href: "/blog" },
+            { label: "Psicología Basada en Evidencia" },
+          ]}
+        />
+
         {/* Header */}
-        <header className="mb-12 text-center">
+        <header className="mb-12">
           <p className="text-sm font-medium text-primary mb-4">Psicología Basada en Evidencia</p>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-6 leading-tight">
             Descubriendo la Importancia de la Psicología Basada en Evidencia en Nuestra Vida Cotidiana
           </h1>
+
+          {/* Share buttons */}
+          <ShareButtons title="Descubriendo la Importancia de la Psicología Basada en Evidencia" />
         </header>
 
         {/* Featured Image */}
@@ -60,6 +73,11 @@ export default function ArticuloPage() {
           <p>
             En conclusión, la Psicología Basada en Evidencia no solo es un enfoque profesional, sino una brújula confiable para navegar por los desafíos de nuestra mente.
           </p>
+        </div>
+
+        {/* Bottom share */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <ShareButtons title="Descubriendo la Importancia de la Psicología Basada en Evidencia" />
         </div>
       </div>
     </article>
