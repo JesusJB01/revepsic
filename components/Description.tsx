@@ -1,60 +1,72 @@
-"use client"
-import React from 'react'
-import { FaFlask, FaBook, FaGraduationCap, FaHandsHelping, FaUserShield, FaGavel } from 'react-icons/fa';
+"use client";
+import React from "react";
+import { FlaskConical, BookOpen, GraduationCap, Handshake, ShieldCheck, Gavel } from "lucide-react";
 
-const caracteristicas = [
+const features = [
   {
-    titulo: "Rigor científico",
-    descripcion: "Nos enorgullece promover la investigación rigurosa en psicología, siempre basada en la evidencia y respaldada por la metodología científica. A través de la revisión por pares, aseguramos la calidad de las investigaciones que compartimos.",
-    icono: <FaFlask size="2rem" style={{ color: "violet" }} />
+    title: "Rigor científico",
+    description: "Promovemos la investigación rigurosa en psicología, siempre basada en la evidencia y respaldada por la metodología científica.",
+    icon: FlaskConical,
   },
   {
-    titulo: "Difusión del conocimiento",
-    descripcion: "Facilitamos la difusión de conocimientos y descubrimientos en psicología mediante la publicación de revistas científicas, organización de conferencias y simposios. Aquí es donde los profesionales y académicos comparten sus investigaciones y avances con la comunidad.",
-    icono: <FaBook size="2rem" color="violet" />
+    title: "Difusión del conocimiento",
+    description: "Facilitamos la difusión de conocimientos mediante publicaciones científicas, conferencias y simposios.",
+    icon: BookOpen,
   },
   {
-    titulo: "Formación y educación",
-    descripcion: "Ofrecemos oportunidades de formación y educación continua para profesionales de la psicología, asegurando que estén siempre al día con los últimos desarrollos en el campo.",
-    icono: <FaGraduationCap size="2rem" color="violet" />
+    title: "Formación y educación",
+    description: "Ofrecemos oportunidades de formación continua para profesionales de la psicología.",
+    icon: GraduationCap,
   },
   {
-    titulo: "Fomento de la colaboración",
-    descripcion: "Promovemos la colaboración entre profesionales de la psicología, tanto a nivel nacional como internacional. Nuestras conferencias, talleres y grupos de trabajo son lugares ideales para establecer conexiones y colaborar en investigaciones.",
-    icono: <FaHandsHelping size="2rem" color="violet" />
+    title: "Fomento de la colaboración",
+    description: "Promovemos la colaboración entre profesionales a nivel nacional e internacional.",
+    icon: Handshake,
   },
   {
-    titulo: "Ética y estándares profesionales",
-    descripcion: "Establecemos y promovemos rigurosos estándares éticos para los psicólogos y psicólogas, garantizando que la integridad y la responsabilidad sean fundamentales en la práctica profesional y la investigación.",
-    icono: <FaUserShield size="2rem" color="violet" />
+    title: "Ética profesional",
+    description: "Establecemos y promovemos rigurosos estándares éticos para los profesionales de la psicología.",
+    icon: ShieldCheck,
   },
   {
-    titulo: "Representación y defensa",
-    descripcion: "Nos dedicamos a representar los intereses de la comunidad de psicólogos ante instituciones gubernamentales, organizaciones profesionales y otros actores relevantes. Defendemos los derechos y el reconocimiento de la psicología como una disciplina científica vital.",
-    icono: <FaGavel size="2rem" color="violet" />
-  }
+    title: "Representación y defensa",
+    description: "Representamos los intereses de la comunidad de psicólogos ante instituciones y organizaciones.",
+    icon: Gavel,
+  },
 ];
 
 export default function Description() {
   return (
-    <div className='bg-gray-100 flex  justify-center w-full px-10 py-20 dark:bg-slate-500'>
+    <section className="py-20 md:py-28 bg-muted">
+      <div className="container">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            ¿Qué nos <span className="text-primary">define</span>?
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Somos una red comprometida con el avance de la psicología científica en Venezuela.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {caracteristicas.map((caracteristica, index) => (
-          <div className="max-w-[400px] rounded-xl border bg-card text-card-foreground shadow bg-white dark:bg-slate-800 p-6" key={index}>
-            <div className="flex gap-3 mb-4 items-center">
-              {caracteristica.icono}
-              <div className="flex flex-col">
-                <p className="text-base text-black dark:text-white font-medium ">{caracteristica.titulo}</p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="group p-6 bg-card rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
+            >
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <feature.icon className="h-6 w-6 text-primary" />
               </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {feature.description}
+              </p>
             </div>
-            <div className="h-px bg-gray-200 dark:bg-gray-700 my-4" />
-            <div className="py-2">
-              <p className='text-justify text-gray-500 dark:text-gray-300 text-sm tracking-tighter '>{caracteristica.descripcion}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

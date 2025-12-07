@@ -1,8 +1,8 @@
-export default function BlogSlugPlaceholder() {
+export default function BlogSlugPage() {
   return (
-    <div className="container mx-auto p-10">
-      <h1 className="text-2xl font-bold">Detalle de Artículo</h1>
-      <p>TODO: Implementar vista de artículo.</p>
+    <div className="container py-20 text-center">
+      <h1 className="text-2xl font-bold text-foreground mb-4">Artículo</h1>
+      <p className="text-muted-foreground">Página en desarrollo. Conectar con API de backend.</p>
     </div>
   );
 }

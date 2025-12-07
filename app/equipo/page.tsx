@@ -1,102 +1,63 @@
 "use client";
 import React from "react";
-// import { Avatar } from "@nextui-org/react";
-import NextImage from "next/image";
+import Image from "next/image";
+import PageHeader from "@/components/PageHeader";
 
-const Team = [
-  {
-    name: "Alejandro Becerra",
-    position: "Presidente",
-    src: "/alejandrobecerra.png"
-  },
-  {
-    name: "Jesus Jimenez",
-    position: "Vicepresidente",
-    src: "/jesus.jpg"
-  },
-  {
-    name: "Adonis Solis",
-    position: "Secretaria",
-    src: "/adonis.jpg"
-  },
-  {
-    name: "Maria Perez",
-    position: "CEO",
-    src: "/maria.jpg"
-  },
-  {
-    name: "Nelson Ledezma",
-    position: "Developer",
-    src: "/nelson.jpg"
-  },
-  {
-    name: "Luis Madera",
-    position: "Developer",
-    src: "/luismadera.jpg"
-  },
-  {
-    name: "Jhonnathan Sulbaran",
-    position: "Developer",
-    src: "/jonnathansulbaran.jpg"
-  },
-  {
-    name: "Wilfredo Diaz",
-    position: "Developer",
-    src: "/wilfredodiaz.jpg"
-  },
-  {
-    name: "Ana Rodriguez",
-    position: "Developer",
-    src: "/anarodriguez.jpg"
-  },
-  {
-    name: "Lady Molina",
-    position: "Developer",
-    src: "/lady.jpg"
-  },
-
+const team = [
+  { name: "Alejandro Becerra", position: "Presidente", src: "/alejandrobecerra.png" },
+  { name: "Jesus Jimenez", position: "Vicepresidente", src: "/jesus.jpg" },
+  { name: "Adonis Solis", position: "Secretaria", src: "/adonis.jpg" },
+  { name: "Maria Perez", position: "CEO", src: "/maria.jpg" },
+  { name: "Nelson Ledezma", position: "Developer", src: "/nelson.jpg" },
+  { name: "Luis Madera", position: "Developer", src: "/luismadera.jpg" },
+  { name: "Jhonnathan Sulbaran", position: "Developer", src: "/jonnathansulbaran.jpg" },
+  { name: "Wilfredo Diaz", position: "Developer", src: "/wilfredodiaz.jpg" },
+  { name: "Ana Rodriguez", position: "Developer", src: "/anarodriguez.jpg" },
+  { name: "Lady Molina", position: "Developer", src: "/lady.jpg" },
 ];
 
-
-export default function Page() {
+export default function EquipoPage() {
   return (
-    <div>
-      <header>
-        <div className="relative mx-auto h-72 md:h-96 w-full max-w-screen-xl md:my-4">
-          <div className="absolute bottom-0 left-0 z-10 h-full w-full bg-gradient-to-t from-gray-700 xl:rounded-lg">
-            <NextImage
-              width={1000}
-              height={1000}
-              src="/team2.svg"
-              alt="Picture of the author"
-              className="absolute left-0 top-0 z-0 h-full w-full object-fill"
-            />
-            <div className="absolute bottom-0 left-0 z-20 p-4">
-              <h2 className="text-xl font-bold italic text-yellow-500">
-                Nuestro Equipo
-              </h2>
-            </div>
+    <>
+      <PageHeader
+        title="Nuestro Equipo"
+        subtitle="Conoce a las personas detrás de REVEPSIC"
+        imageSrc="/team2.svg"
+        imageAlt="Equipo REVEPSIC"
+      />
+
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              El <span className="text-primary">Equipo</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Profesionales comprometidos con el avance de la psicología científica en Venezuela.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {team.map((member, index) => (
+              <div
+                key={index}
+                className="group text-center"
+              >
+                <div className="relative w-24 h-24 md:w-28 md:h-28 mx-auto mb-4 rounded-full overflow-hidden border-4 border-border group-hover:border-primary transition-colors">
+                  <Image
+                    src={member.src}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
+                <p className="text-xs text-muted-foreground">{member.position}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </header>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 pb-52 pt-20 container mx-auto">
-        {Team.map((user, index) => (
-          <div key={index} className="flex flex-col items-center gap-4">
-            <div className="relative w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-full border-2 border-gray-200">
-              <NextImage
-                src={user.src}
-                alt={user.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <p className="text-center text-lg font-semibold">{user.name}</p>
-            {/* <p className="text-center text-gray-500">{user.position}</p> */}
-          </div>
-        ))}
-      </div>
-
-    </div>
+      </section>
+    </>
   );
 }

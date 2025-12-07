@@ -1,79 +1,93 @@
-import Link from 'next/link';
-import { FaFacebook, FaTwitter, FaInstagram, FaEnvelope } from 'react-icons/fa';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
-const Footer = () => {
+const footerLinks = {
+  navigation: [
+    { name: "Home", href: "/" },
+    { name: "Nosotros", href: "/nosotros" },
+    { name: "Contacto", href: "/contacto" },
+    { name: "Team", href: "/equipo" },
+    { name: "Blog", href: "/blog" },
+  ],
+  social: [
+    { name: "Facebook", href: "https://www.facebook.com/profile.php?id=100063495787504", icon: Facebook },
+    { name: "Instagram", href: "https://www.instagram.com/revepsic/", icon: Instagram },
+    { name: "Twitter", href: "https://twitter.com/REVEPSIC", icon: Twitter },
+  ],
+};
+
+export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-8 px-5">
-      <div className="container mx-auto flex flex-col md:flex-row  justify-between">
-
-        <div className="flex flex-col gap-y-2  md:flex-row">
-          <div className="md:mr-8 ">
-            <h2 className="text-2xl font-bold">Revepsic</h2>
-            <p className="text-sm mt-2">Psicologia Cientifica.</p>
+    <footer className="border-t border-border bg-card">
+      <div className="container py-12 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Brand */}
+          <div className="space-y-4">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="relative h-10 w-10">
+                <Image
+                  src="/favicon.svg"
+                  alt="REVEPSIC"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <span className="text-xl font-bold">
+                <span className="text-foreground">REVEP</span>
+                <span className="text-primary">SIC</span>
+              </span>
+            </Link>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Red Venezolana Para el Avance de la Psicología Científica. Líderes en la difusión y divulgación en Venezuela.
+            </p>
           </div>
-          <ul className="flex space-x-4   mt-1">
-            <li>
-              <Link href="#" className="hover:text-blue-400">
-                Inicio
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-blue-400">
-                Acerca de
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-blue-400">
-                Servicios
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-blue-400">
-                Contacto
-              </Link>
-            </li>
-          </ul>
+
+          {/* Navigation */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-4">Navegación</h3>
+            <ul className="space-y-2">
+              {footerLinks.navigation.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Social */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-4">Síguenos</h3>
+            <div className="flex gap-3">
+              {footerLinks.social.map((social) => (
+                <Link
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-10 w-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                  aria-label={social.name}
+                >
+                  <social.icon className="h-5 w-5" />
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
 
-
-        <div className="flex mt-1  ">
-          <ul className="flex space-x-4">
-            <li>
-              <Link href="#" className="hover:text-blue-400">
-                Términos de uso
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-blue-400">
-                Política de privacidad
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-
-      <div className="mt-8">
-        <div className="container mx-auto flex flex-col gap-y-2 md:flex-row items-center justify-between">
-          <div className="flex space-x-4">
-            <Link href="#" className="hover:text-blue-400">
-              <FaFacebook />
-            </Link>
-            <Link href="#" className="hover:text-blue-400">
-              <FaTwitter />
-            </Link>
-            <Link href="#" className="hover:text-blue-400">
-              <FaInstagram />
-            </Link>
-            <Link href="#" className="hover:text-blue-400">
-              <FaEnvelope />
-            </Link>
-          </div>
-         
+        {/* Copyright */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <p className="text-sm text-muted-foreground text-center">
+            © {new Date().getFullYear()} REVEPSIC. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
   );
 }
-
-export default Footer;

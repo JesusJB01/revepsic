@@ -1,111 +1,93 @@
-"use client"
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-// import { createClient } from '@supabase/supabase-js';
+"use client";
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
+export default function Newsletter() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
-const Newsletter = () => {
-  // Supabase configuration
-  // const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  // const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  // const supabase = createClient(supabaseUrl, supabaseKey);
-
-  // Component state
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [registro, setRegistro] = useState('');
-
-
-  // Event handler for input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    setError("")
-  };
-
-  // Function to validate email format
-  const isEmailValid = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // Event handler for form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate email format
-    if (!isEmailValid(email)) {
-      setError('Ingrese un correo electrónico válido.');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setStatus("error");
+      setMessage("Por favor, ingresa un correo válido.");
       return;
     }
 
-    try {
-      // TODO: Connect to backend API
-      console.log('TODO: Submit email to API:', email);
+    // TODO: Connect to API
+    console.log("Subscribing:", email);
+    setStatus("success");
+    setMessage("¡Gracias por suscribirte!");
+    setEmail("");
 
-      // Clear the input field and show success message
-      setEmail('');
-      setRegistro('¡Registro exitoso! (Simulado)');
-
-      // Set a timeout to clear the messages after 3 seconds
-      setTimeout(() => {
-        setRegistro('');
-      }, 3000);
-
-    } catch (error: any) {
-      console.error('Error submitting form:', error?.message);
-    }
+    setTimeout(() => {
+      setStatus("idle");
+      setMessage("");
+    }, 3000);
   };
 
   return (
-    <section className="w-full h-2/3 py-12 md:py-16 lg:py-20 xl:py-24 overflow-hidden bg-gray-900">
-      <div className="container mx-auto px-10">
-        <div className="flex flex-wrap -mx-4 items-center">
-          <div className="w-full lg:w-1/2 px-4 mb-4 lg:mb-0">
-            <div className="max-w-lg mx-auto">
-              <h4 className="text-3xl sm:text-4xl lg:text-5xl text-white font-bold mb-6 md:mb-8">Regístrate al newsletter</h4>
-              <div className="mb-8">
-                <div className="text-gray-400">Mantente informado con todo lo que necesitas saber en Psicología.</div>
-              </div>
-              {error && <p className="text-white text-center text-sm bg-red-500 rounded-lg mb-5 p-3">{error}</p>}
-              {registro && <p className="text-white text-center text-sm bg-green-500 rounded-lg mb-5 p-3">{registro}</p>}
-              <div className="sm:flex mb-4 items-center ">
-                <input
-                  className={`w-full mb-3 sm:mb-0 sm:mr-4 py-3 px-4 text-sm text-gray-900 placeholder-gray-400 border ${error ? 'border-red-500' : 'border-gray-200'
-                    } focus:border-purple-500 focus:outline-purple rounded-lg`}
-                  type="email"
-                  placeholder="correo@correo.com"
-                  value={email}
-                  onChange={handleInputChange}
-                />
+    <section className="py-20 md:py-28 bg-slate-950 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/50 via-transparent to-transparent" />
 
+      <div className="container relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Content */}
+          <div className="space-y-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+              Regístrate al <span className="gradient-text">newsletter</span>
+            </h2>
+            <p className="text-lg text-slate-400 max-w-md">
+              Mantente informado con todo lo que necesitas saber en Psicología.
+            </p>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="correo@ejemplo.com"
+                  className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
                 <button
-                  className="inline-block w-full sm:w-auto py-3 px-5 text-sm font-semibold text-white hover:text-gray-300 bg-slate-500 rounded-md overflow-hidden transition duration-300"
                   type="submit"
-                  onClick={handleSubmit}
+                  className="px-6 py-3 gradient-bg text-slate-950 font-semibold rounded-xl hover:opacity-90 transition-all hover:scale-105 active:scale-95"
                 >
-                  <div className="group-hover:translate-x-full group-hover:scale-102 transition duration-500"></div>
-                  <div className="flex items-center justify-center">
-                    <span className="mr-2">Subscribe</span>
-                    <svg width="8" height="11" viewBox="0 0 8 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6.82994 5.04001L2.58994 0.80001C2.49698 0.706281 2.38638 0.631887 2.26452 0.581118C2.14266 0.530349 2.01195 0.504211 1.87994 0.504211C1.74793 0.504211 1.61723 0.530349 1.49537 0.581118C1.37351 0.631887 1.26291 0.706281 1.16994 0.80001C0.983692 0.987372 0.87915 1.24082 0.87915 1.50501C0.87915 1.7692 0.983692 2.02265 1.16994 2.21001L4.70994 5.75001L1.16994 9.29001C0.983692 9.47737 0.87915 9.73082 0.87915 9.99501C0.87915 10.2592 0.983692 10.5126 1.16994 10.7C1.26338 10.7927 1.3742 10.866 1.49604 10.9158C1.61787 10.9655 1.74834 10.9908 1.87994 10.99C2.01155 10.9908 2.14201 10.9655 2.26385 10.9158C2.38569 10.866 2.4965 10.7927 2.58994 10.7L6.82994 6.46001C6.92367 6.36705 6.99806 6.25645 7.04883 6.13459C7.0996 6.01273 7.12574 5.88202 7.12574 5.75001C7.12574 5.618 7.0996 5.48729 7.04883 5.36543C6.99806 5.24357 6.92367 5.13297 6.82994 5.04001Z" fill="currentColor"></path>
-                    </svg>
-                  </div>
+                  Suscribirse
                 </button>
               </div>
-              <span className="block text-xs font-semibold text-gray-500">
-                <span>Nos preocupamos por tus datos en nuestra</span>
-                <Link className="inline-block ml-1 text-orange-900 hover:text-orange-700" href="#">política de privacidad</Link>
-              </span>
-            </div>
+
+              {message && (
+                <p className={`text-sm ${status === "error" ? "text-red-400" : "text-green-400"}`}>
+                  {message}
+                </p>
+              )}
+            </form>
+
+            <p className="text-xs text-slate-500">
+              Nos preocupamos por tus datos. Lee nuestra{" "}
+              <Link href="#" className="text-slate-400 hover:text-primary transition-colors">
+                política de privacidad
+              </Link>
+              .
+            </p>
           </div>
-          <div className="w-full lg:w-1/2 px-4">
-            <div className="max-w-lg mx-auto">
+
+          {/* Illustration */}
+          <div className="relative hidden lg:block">
+            <div className="relative aspect-square max-w-md mx-auto">
               <Image
-                src="/newsletter.svg"
-                width={500}
-                height={500}
-                alt=""
+                src="/newsletter-illustration.png"
+                alt="Newsletter"
+                fill
+                className="object-contain drop-shadow-2xl"
               />
             </div>
           </div>
@@ -113,6 +95,4 @@ const Newsletter = () => {
       </div>
     </section>
   );
-};
-
-export default Newsletter;
+}
