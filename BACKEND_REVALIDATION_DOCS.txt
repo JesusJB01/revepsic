@@ -1,0 +1,198 @@
+================================================================================
+            DOCUMENTACIÓN PARA BACKEND - REVALIDACIÓN DE CACHÉ
+                           Frontend REVEPSIC
+================================================================================
+
+RESUMEN
+--------------------------------------------------------------------------------
+El frontend ahora usa Server Components con caché automático. Para que los 
+cambios en posts, tags o autores se reflejen inmediatamente en la web, el 
+backend debe notificar al frontend cuando ocurran cambios.
+
+================================================================================
+                    1. CONFIGURACIÓN REQUERIDA
+================================================================================
+
+VARIABLES DE ENTORNO (Backend)
+--------------------------------------------------------------------------------
+Añadir estas variables al .env del BACKEND:
+
+FRONTEND_URL=http://localhost:3000          # URL del frontend (dev)
+REVALIDATE_SECRET=revepsic-revalidate-2024  # Secret compartido con frontend
+
+En producción:
+FRONTEND_URL=https://revepsic.com           # URL de producción
+REVALIDATE_SECRET=<generar-secret-seguro>   # Mismo valor que en frontend
+
+
+================================================================================
+                    2. ENDPOINT DE REVALIDACIÓN
+================================================================================
+
+URL: POST {FRONTEND_URL}/api/revalidate
+
+HEADERS REQUERIDOS:
+- Content-Type: application/json
+- x-revalidate-secret: {REVALIDATE_SECRET}
+
+BODY (JSON):
+{
+    "type": "post" | "tag" | "author" | "all",
+    "slug": "slug-del-recurso",   // opcional, para revalidación específica
+    "action": "create" | "update" | "delete"  // opcional, informativo
+}
+
+RESPUESTA EXITOSA (200):
+{
+    "success": true,
+    "revalidated": true,
+    "now": 1702000000000,
+    "type": "post",
+    "slug": "mi-articulo"
+}
+
+RESPUESTA ERROR (401):
+{
+    "success": false,
+    "error": "Invalid secret"
+}
+
+
+================================================================================
+                    3. CUÁNDO LLAMAR AL ENDPOINT
+================================================================================
+
+| Acción                        | type     | slug requerido |
+|-------------------------------|----------|----------------|
+| Crear post                    | "post"   | Sí (nuevo)     |
+| Editar post                   | "post"   | Sí             |
+| Eliminar post                 | "post"   | Sí             |
+| Publicar/Despublicar post     | "post"   | Sí             |
+| Crear/Editar/Eliminar tag     | "tag"    | Opcional       |
+| Editar perfil de autor        | "author" | Sí             |
+| Revalidar todo (emergencia)   | "all"    | No             |
+
+
+================================================================================
+                    4. EJEMPLOS DE IMPLEMENTACIÓN
+================================================================================
+
+JAVASCRIPT/NODE.JS (Express/Fastify)
+--------------------------------------------------------------------------------
+
+// utils/revalidate.js
+async function notifyFrontend(type, slug = null, action = null) {
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET;
+
+    if (!REVALIDATE_SECRET) {
+        console.warn('[Revalidate] REVALIDATE_SECRET not configured');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${FRONTEND_URL}/api/revalidate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-revalidate-secret': REVALIDATE_SECRET,
+            },
+            body: JSON.stringify({ type, slug, action }),
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log(`[Revalidate] Success: ${type}${slug ? `/${slug}` : ''}`);
+        } else {
+            console.error('[Revalidate] Failed:', data.error);
+        }
+    } catch (error) {
+        console.error('[Revalidate] Error:', error.message);
+        // No lanzar error - la revalidación no debe bloquear la operación principal
+    }
+}
+
+module.exports = { notifyFrontend };
+
+
+USO EN CONTROLADORES
+--------------------------------------------------------------------------------
+
+// controllers/posts.controller.js
+const { notifyFrontend } = require('../utils/revalidate');
+
+// Después de crear un post
+async function createPost(req, res) {
+    const post = await Post.create(req.body);
+    
+    // Notificar al frontend (no bloquea la respuesta)
+    notifyFrontend('post', post.slug, 'create');
+    
+    res.status(201).json({ success: true, data: post });
+}
+
+// Después de actualizar un post
+async function updatePost(req, res) {
+    const post = await Post.findByIdAndUpdate(id, req.body);
+    
+    notifyFrontend('post', post.slug, 'update');
+    
+    res.json({ success: true, data: post });
+}
+
+// Después de eliminar un post
+async function deletePost(req, res) {
+    const post = await Post.findByIdAndDelete(id);
+    
+    notifyFrontend('post', post.slug, 'delete');
+    
+    res.json({ success: true, message: 'Post deleted' });
+}
+
+
+================================================================================
+                    5. NOTAS IMPORTANTES
+================================================================================
+
+1. NO BLOQUEAR OPERACIONES
+   - La llamada al webhook debe ser asíncrona y no bloquear la respuesta
+   - Si falla, solo loguear el error, no devolver error al usuario
+
+2. TIMING
+   - Llamar DESPUÉS de que la operación en la base de datos sea exitosa
+   - El frontend puede tardar unos milisegundos en revalidar
+
+3. SEGURIDAD
+   - El REVALIDATE_SECRET debe ser el mismo en frontend y backend
+   - En producción, generar un secret fuerte (mínimo 32 caracteres)
+
+4. SIN SERVIDOR FRONTEND
+   - Si el frontend no está corriendo, la llamada fallará silenciosamente
+   - Esto es esperado en desarrollo cuando solo trabajas en backend
+
+5. RATE LIMITING
+   - No hay límite de llamadas, pero evita llamadas innecesarias
+   - Si haces muchas operaciones en batch, considera llamar "all" una vez al final
+
+
+================================================================================
+                    6. TESTING
+================================================================================
+
+Probar manualmente con curl:
+
+# Desarrollo (sin secret en dev mode GET)
+curl "http://localhost:3000/api/revalidate?type=all"
+
+# Producción (con secret)
+curl -X POST http://localhost:3000/api/revalidate \
+  -H "Content-Type: application/json" \
+  -H "x-revalidate-secret: revepsic-revalidate-2024" \
+  -d '{"type": "post", "slug": "mi-articulo"}'
+
+
+================================================================================
+Fecha: Diciembre 2024
+Autor: Equipo Frontend REVEPSIC
+================================================================================
