@@ -1,0 +1,191 @@
+================================================================================
+                    PALETA DE COLORES - REVEPSIC
+================================================================================
+
+MODO CLARO (Light Mode)
+--------------------------------------------------------------------------------
+
+Background (Fondo principal)
+  RGB: 248 250 252
+  Tailwind: slate-50
+  CSS: rgb(248 250 252)
+
+Foreground (Texto principal)
+  RGB: 15 23 42
+  Tailwind: slate-950
+  CSS: rgb(15 23 42)
+
+Primary (Color primario - Ámbar/Dorado)
+  RGB: 245 158 11
+  Tailwind: amber-500
+  CSS: rgb(245 158 11)
+  Foreground: rgb(15 23 42)
+
+Secondary (Color secundario - Rosa)
+  RGB: 236 72 153
+  Tailwind: pink-500
+  CSS: rgb(236 72 153)
+  Foreground: rgb(255 255 255)
+
+Card (Fondo de tarjetas)
+  RGB: 255 255 255
+  Tailwind: white
+  CSS: rgb(255 255 255)
+  Foreground: rgb(15 23 42)
+
+Muted (Fondos atenuados)
+  RGB: 241 245 249
+  Tailwind: slate-100
+  CSS: rgb(241 245 249)
+  Foreground: rgb(100 116 139) - slate-500
+
+Accent (Acentos)
+  RGB: 241 245 249
+  Tailwind: slate-100
+  CSS: rgb(241 245 249)
+  Foreground: rgb(15 23 42)
+
+Border (Bordes)
+  RGB: 226 232 240
+  Tailwind: slate-200
+  CSS: rgb(226 232 240)
+
+Input (Campos de entrada)
+  RGB: 226 232 240
+  Tailwind: slate-200
+  CSS: rgb(226 232 240)
+
+Ring (Anillo de enfoque)
+  RGB: 245 158 11
+  Tailwind: amber-500
+  CSS: rgb(245 158 11)
+
+
+MODO OSCURO (Dark Mode)
+--------------------------------------------------------------------------------
+
+Background (Fondo principal)
+  RGB: 15 23 42
+  Tailwind: slate-950
+  CSS: rgb(15 23 42)
+
+Foreground (Texto principal)
+  RGB: 248 250 252
+  Tailwind: slate-50
+  CSS: rgb(248 250 252)
+
+Primary (Color primario - Ámbar/Dorado)
+  RGB: 251 191 36
+  Tailwind: amber-400
+  CSS: rgb(251 191 36)
+  Foreground: rgb(15 23 42)
+
+Secondary (Color secundario - Rosa)
+  RGB: 244 114 182
+  Tailwind: pink-400
+  CSS: rgb(244 114 182)
+  Foreground: rgb(15 23 42)
+
+Card (Fondo de tarjetas)
+  RGB: 30 41 59
+  Tailwind: slate-800
+  CSS: rgb(30 41 59)
+  Foreground: rgb(248 250 252)
+
+Muted (Fondos atenuados)
+  RGB: 51 65 85
+  Tailwind: slate-700
+  CSS: rgb(51 65 85)
+  Foreground: rgb(148 163 184) - slate-400
+
+Accent (Acentos)
+  RGB: 51 65 85
+  Tailwind: slate-700
+  CSS: rgb(51 65 85)
+  Foreground: rgb(248 250 252)
+
+Border (Bordes)
+  RGB: 51 65 85
+  Tailwind: slate-700
+  CSS: rgb(51 65 85)
+
+Input (Campos de entrada)
+  RGB: 51 65 85
+  Tailwind: slate-700
+  CSS: rgb(51 65 85)
+
+Ring (Anillo de enfoque)
+  RGB: 251 191 36
+  Tailwind: amber-400
+  CSS: rgb(251 191 36)
+
+
+CARACTERÍSTICAS ESPECIALES
+--------------------------------------------------------------------------------
+
+Radius (Radio de bordes)
+  Valor: 0.75rem (12px)
+
+Gradiente de marca
+  Dirección: 135deg
+  Inicio: rgb(var(--secondary)) - Rosa
+  Fin: rgb(var(--primary)) - Ámbar
+  CSS: linear-gradient(135deg, rgb(var(--secondary)) 0%, rgb(var(--primary)) 100%)
+
+Transiciones
+  Duración: 0.3s
+  Timing: ease
+  Propiedades: background-color, color, border-color
+
+
+COLORES PRINCIPALES DE LA MARCA
+--------------------------------------------------------------------------------
+
+🟡 ÁMBAR/DORADO (Primary)
+   - Representa energía y creatividad
+   - Light: rgb(245 158 11) - amber-500
+   - Dark: rgb(251 191 36) - amber-400
+
+🌸 ROSA (Secondary)
+   - Añade un toque moderno y vibrante
+   - Light: rgb(236 72 153) - pink-500
+   - Dark: rgb(244 114 182) - pink-400
+
+⚫ SLATE (Base)
+   - Para fondos y textos
+   - Proporciona contraste y legibilidad
+   - Rango: slate-50 a slate-950
+
+
+CLASES DE UTILIDAD DISPONIBLES
+--------------------------------------------------------------------------------
+
+Fondos:
+  .bg-background
+  .bg-card
+  .bg-muted
+  .bg-primary
+  .bg-secondary
+
+Textos:
+  .text-foreground
+  .text-card-foreground
+  .text-muted-foreground
+  .text-primary
+  .text-secondary
+
+Bordes:
+  .border-border
+
+Gradientes:
+  .gradient-text (texto con gradiente)
+  .gradient-bg (fondo con gradiente)
+
+Transiciones:
+  .transition-theme (transiciones suaves de tema)
+
+
+================================================================================
+Archivo generado: 2025-12-08
+Ubicación: /home/jesusjb/revepsic/project-revepsic/app/globals.css
+================================================================================

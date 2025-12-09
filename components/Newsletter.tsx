@@ -8,12 +8,21 @@ import { newsletterApi } from "@/lib/api";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validar nombre
+    if (!name.trim()) {
+      setStatus("error");
+      setMessage("Por favor, ingresa tu nombre.");
+      return;
+    }
+
+    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setStatus("error");
@@ -23,12 +32,20 @@ export default function Newsletter() {
 
     setStatus("loading");
 
-    const response = await newsletterApi.subscribe(email, "homepage_newsletter");
+    const response = await newsletterApi.subscribe(email, name.trim(), "homepage_newsletter");
 
     if (response.success) {
-      setStatus("success");
-      setMessage("¡Gracias por suscribirte!");
+      // Verificar si ya estaba suscrito
+      const msg = response.message?.toLowerCase() || "";
+      if (msg.includes("already subscribed") || msg.includes("ya suscrito")) {
+        setStatus("success");
+        setMessage("Este correo ya está suscrito a nuestro newsletter. ¡Gracias por tu interés!");
+      } else {
+        setStatus("success");
+        setMessage("¡Revisa tu email para confirmar tu suscripción!");
+      }
       setEmail("");
+      setName("");
     } else {
       setStatus("error");
       setMessage(response.message || "Error al suscribirse. Intenta de nuevo.");
@@ -74,22 +91,34 @@ export default function Newsletter() {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col gap-3">
                   <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="correo@ejemplo.com"
-                    className="flex-1 px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Tu nombre"
+                    className="px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    disabled={status === "loading"}
                   />
-                  <motion.button
-                    type="submit"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 gradient-bg text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/20"
-                  >
-                    Suscribirse
-                  </motion.button>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="correo@ejemplo.com"
+                      className="flex-1 px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      disabled={status === "loading"}
+                    />
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: status === "loading" ? 1 : 1.05 }}
+                      whileTap={{ scale: status === "loading" ? 1 : 0.95 }}
+                      disabled={status === "loading"}
+                      className="px-6 py-3 gradient-bg text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {status === "loading" ? "Enviando..." : "Suscribirse"}
+                    </motion.button>
+                  </div>
                 </div>
 
                 {message && (

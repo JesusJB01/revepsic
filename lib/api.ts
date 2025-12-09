@@ -270,11 +270,55 @@ export const tagsApi = {
 };
 
 // ============ NEWSLETTER API ============
+export interface Subscriber {
+  id: string;
+  email: string;
+  name?: string;
+  status: 'PENDING' | 'ACTIVE' | 'UNSUBSCRIBED' | 'BOUNCED';
+  tier: 'FREE' | 'PREMIUM';
+  source?: string;
+  createdAt: string;
+  confirmedAt?: string;
+}
+
+export interface NewsletterStats {
+  total: number;
+  byStatus: { ACTIVE: number; PENDING: number; UNSUBSCRIBED: number; BOUNCED?: number };
+  byTier: { FREE: number; PREMIUM: number };
+  last30Days: number;
+}
+
+export interface SubscribersResponse {
+  data: Subscriber[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export const newsletterApi = {
-  subscribe: (email: string, source?: string) =>
-    apiFetch('/newsletter/subscribe', { method: 'POST', body: { email, source } }),
+  // Públicos
+  subscribe: (email: string, name: string, source?: string) =>
+    apiFetch('/newsletter/subscribe', { method: 'POST', body: { email, name, source } }),
   unsubscribe: (email: string) =>
     apiFetch('/newsletter/unsubscribe', { method: 'POST', body: { email } }),
+  confirmSubscription: (token: string) =>
+    apiFetch<{ message: string }>(`/newsletter/confirm/${token}`),
+
+  // Admin (requieren auth)
+  getSubscribers: (params?: { page?: number; limit?: number; status?: string; tier?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.status) query.set('status', params.status);
+    if (params?.tier) query.set('tier', params.tier);
+    return apiFetch<SubscribersResponse>(`/newsletter/subscribers?${query.toString()}`, { auth: true });
+  },
+  getStats: () => apiFetch<NewsletterStats>('/newsletter/stats', { auth: true }),
+  updateTier: (id: string, tier: 'FREE' | 'PREMIUM') =>
+    apiFetch(`/newsletter/subscribers/${id}/tier`, { method: 'PATCH', body: { tier }, auth: true }),
 };
 
 // ============ DASHBOARD API ============
