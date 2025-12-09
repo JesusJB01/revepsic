@@ -33,11 +33,26 @@ export default async function BlogPage({ searchParams }: Props) {
   ]);
 
   // Extraer datos con manejo seguro
-  const postsData = postsResponse?.data;
-  const posts: Post[] = Array.isArray(postsData)
-    ? postsData
-    : (postsData?.data || []);
-  const pagination = postsData?.pagination || { page: 1, totalPages: 1, total: 0, limit: 6 };
+  // Estructura de respuesta: { success: true, data: { data: Post[], pagination: {...} } }
+  const responseData = postsResponse?.data;
+  let posts: Post[] = [];
+  let pagination = { page: 1, totalPages: 1, total: 0, limit: 6 };
+
+  if (responseData) {
+    // DEBUG: Ver estructura de respuesta
+    console.log('[Blog Page] API Response:', JSON.stringify(responseData, null, 2).slice(0, 500));
+
+    // Si responseData tiene .data (estructura anidada del backend)
+    if (responseData.data && Array.isArray(responseData.data)) {
+      posts = responseData.data;
+      pagination = responseData.pagination || pagination;
+    } else if (Array.isArray(responseData)) {
+      // Fallback: si responseData es directamente un array
+      posts = responseData;
+    }
+  }
+
+  console.log('[Blog Page] Posts:', posts.length, 'Pagination:', pagination);
 
   const tagsData = tagsResponse?.data;
   const tags: Tag[] = Array.isArray(tagsData) ? tagsData : [];
