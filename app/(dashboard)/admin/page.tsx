@@ -1,28 +1,47 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { dashboardApi, DashboardOverview } from "@/lib/api";
-import { FileText, Users, Eye, TrendingUp, Clock } from "lucide-react";
+import { dashboardApi, DashboardOverview, postsApi, Post } from "@/lib/api";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { FileText, Users, Eye, TrendingUp, Clock, Edit } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [data, setData] = useState<DashboardOverview | null>(null);
+  const [editorPosts, setEditorPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const isAdmin = user?.role === 'ADMIN';
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await dashboardApi.getOverview();
-      if (response.success && response.data) {
-        setData(response.data);
+      if (isAdmin) {
+        // Admin ve estadísticas completas
+        const response = await dashboardApi.getOverview();
+        if (response.success && response.data) {
+          setData(response.data);
+        } else {
+          setError("Error al cargar datos");
+        }
       } else {
-        setError("Error al cargar datos");
+        // Editor solo ve sus posts recientes
+        try {
+          const response = await postsApi.getAll({ limit: 10 });
+          if (response.success && response.data) {
+            const postsData = response.data.data || response.data;
+            setEditorPosts(Array.isArray(postsData) ? postsData : []);
+          }
+        } catch {
+          setError("Error al cargar posts");
+        }
       }
       setIsLoading(false);
     };
     fetchData();
-  }, []);
+  }, [isAdmin]);
 
   if (isLoading) {
     return (
@@ -41,6 +60,91 @@ export default function AdminDashboard() {
     );
   }
 
+  // Vista para EDITOR
+  if (!isAdmin) {
+    return (
+      <div className="space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground">Bienvenido, {user?.name}</p>
+        </div>
+
+        {/* Quick Stats for Editor */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link
+            href="/admin/posts"
+            className="group p-6 bg-card rounded-2xl border border-border hover:border-primary/50 transition-all hover:shadow-lg"
+          >
+            <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <FileText className="h-6 w-6" />
+            </div>
+            <p className="text-3xl font-bold text-foreground mb-1">{editorPosts.length}</p>
+            <p className="text-sm text-muted-foreground">Posts disponibles</p>
+          </Link>
+
+          <Link
+            href="/admin/posts/nuevo"
+            className="group p-6 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl border border-border hover:border-primary/50 transition-all hover:shadow-lg"
+          >
+            <div className="h-12 w-12 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center mb-4">
+              <TrendingUp className="h-6 w-6" />
+            </div>
+            <p className="text-xl font-bold text-foreground mb-1">Crear Nuevo Post</p>
+            <p className="text-sm text-muted-foreground">Escribe un nuevo artículo</p>
+          </Link>
+        </div>
+
+        {/* Recent Posts for Editor */}
+        <div className="bg-card rounded-2xl border border-border p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-foreground">Posts Recientes</h2>
+            <Link href="/admin/posts" className="text-primary text-sm hover:underline">
+              Ver todos
+            </Link>
+          </div>
+
+          {editorPosts.length > 0 ? (
+            <div className="space-y-4">
+              {editorPosts.slice(0, 5).map((post) => (
+                <div
+                  key={post.id}
+                  className="flex items-center justify-between p-4 bg-muted rounded-xl"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground truncate">{post.title}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {post.status === 'PUBLISHED' ? (
+                        post.publishedAt ? format(new Date(post.publishedAt), "d MMM yyyy", { locale: es }) : 'Publicado'
+                      ) : (
+                        <span className="text-amber-500">Borrador</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Eye className="h-4 w-4" />
+                      <span className="text-sm">{post.viewCount}</span>
+                    </div>
+                    <Link
+                      href={`/admin/posts/${post.slug}/editar`}
+                      className="p-2 hover:bg-background rounded-lg transition-colors"
+                    >
+                      <Edit className="h-4 w-4 text-muted-foreground" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-8">No tienes posts aún</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Vista para ADMIN (original)
   if (error || !data) {
     return (
       <div className="text-center py-20">

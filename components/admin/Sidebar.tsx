@@ -19,13 +19,13 @@ import {
 } from "lucide-react";
 
 const navItems = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Posts", href: "/admin/posts", icon: FileText },
-    { name: "Autores", href: "/admin/autores", icon: UserCircle },
-    { name: "Tags", href: "/admin/tags", icon: Tags },
-    { name: "Usuarios", href: "/admin/usuarios", icon: Users },
-    { name: "Suscriptores", href: "/admin/suscriptores", icon: Mail },
-    { name: "Métricas", href: "/admin/metricas", icon: BarChart3 },
+    { name: "Dashboard", href: "/admin", icon: LayoutDashboard, roles: ['ADMIN', 'EDITOR', 'VIEWER'] },
+    { name: "Posts", href: "/admin/posts", icon: FileText, roles: ['ADMIN', 'EDITOR'] },
+    { name: "Autores", href: "/admin/autores", icon: UserCircle, roles: ['ADMIN'] },
+    { name: "Tags", href: "/admin/tags", icon: Tags, roles: ['ADMIN'] },
+    { name: "Usuarios", href: "/admin/usuarios", icon: Users, roles: ['ADMIN'] },
+    { name: "Suscriptores", href: "/admin/suscriptores", icon: Mail, roles: ['ADMIN'] },
+    { name: "Métricas", href: "/admin/metricas", icon: BarChart3, roles: ['ADMIN'] },
 ];
 
 export default function AdminSidebar() {
@@ -99,33 +99,43 @@ export default function AdminSidebar() {
 
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-                    {navItems.map((item) => {
-                        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                        return (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                onClick={() => setIsMobileOpen(false)}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all
+                    {navItems
+                        .filter((item) => user?.role && item.roles.includes(user.role))
+                        .map((item) => {
+                            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                            return (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    onClick={() => setIsMobileOpen(false)}
+                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all
                   ${isActive
-                                        ? "bg-primary text-primary-foreground"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                    }
+                                            ? "bg-primary text-primary-foreground"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                        }
                   ${isCollapsed ? "justify-center" : ""}
                 `}
-                            >
-                                <item.icon className="h-5 w-5 flex-shrink-0" />
-                                {!isCollapsed && <span className="font-medium">{item.name}</span>}
-                            </Link>
-                        );
-                    })}
+                                >
+                                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                                    {!isCollapsed && <span className="font-medium">{item.name}</span>}
+                                </Link>
+                            );
+                        })}
                 </nav>
 
                 {/* User section */}
                 <div className="p-4 border-t border-border">
                     {!isCollapsed && user && (
                         <div className="mb-3 px-3">
-                            <p className="font-medium text-foreground text-sm truncate">{user.name}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                                <p className="font-medium text-foreground text-sm truncate">{user.name}</p>
+                                <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${user.role === 'ADMIN' ? 'bg-red-500/10 text-red-500' :
+                                        user.role === 'EDITOR' ? 'bg-blue-500/10 text-blue-500' :
+                                            'bg-gray-500/10 text-gray-500'
+                                    }`}>
+                                    {user.role}
+                                </span>
+                            </div>
                             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                         </div>
                     )}

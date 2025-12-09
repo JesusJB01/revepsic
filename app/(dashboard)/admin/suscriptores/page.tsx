@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { newsletterApi, Subscriber, NewsletterStats } from "@/lib/api";
-import { Users, TrendingUp, TrendingDown, Mail, Clock, ChevronLeft, ChevronRight, Filter, Crown } from "lucide-react";
+import { Users, TrendingUp, TrendingDown, Mail, Clock, ChevronLeft, ChevronRight, Filter, Crown, Search } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import RoleGuard from "@/components/auth/RoleGuard";
 
 type StatusFilter = '' | 'PENDING' | 'ACTIVE' | 'UNSUBSCRIBED' | 'BOUNCED';
 type TierFilter = '' | 'FREE' | 'PREMIUM';
@@ -22,6 +23,7 @@ export default function SubscribersAdminPage() {
     // Filtros
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
     const [tierFilter, setTierFilter] = useState<TierFilter>('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchStats = async () => {
         const response = await newsletterApi.getStats();
@@ -128,196 +130,222 @@ export default function SubscribersAdminPage() {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-foreground">Suscriptores</h1>
-                <p className="text-muted-foreground">Gestión del newsletter</p>
-            </div>
+        <RoleGuard allowedRoles={['ADMIN']}>
+            <div className="space-y-6">
+                {/* Header */}
+                <div>
+                    <h1 className="text-3xl font-bold text-foreground">Suscriptores</h1>
+                    <p className="text-muted-foreground">Gestión del newsletter</p>
+                </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                            <Users className="h-5 w-5 text-blue-500" />
+                {/* Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div className="p-6 bg-card rounded-2xl border border-border">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                <Users className="h-5 w-5 text-blue-500" />
+                            </div>
+                            <span className="text-2xl font-bold text-foreground">{stats?.total || 0}</span>
                         </div>
-                        <span className="text-2xl font-bold text-foreground">{stats?.total || 0}</span>
+                        <p className="text-sm text-muted-foreground">Total</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">Total</p>
-                </div>
 
-                <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                            <TrendingUp className="h-5 w-5 text-green-500" />
+                    <div className="p-6 bg-card rounded-2xl border border-border">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-10 w-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                <TrendingUp className="h-5 w-5 text-green-500" />
+                            </div>
+                            <span className="text-2xl font-bold text-foreground">{stats?.byStatus.ACTIVE || 0}</span>
                         </div>
-                        <span className="text-2xl font-bold text-foreground">{stats?.byStatus.ACTIVE || 0}</span>
+                        <p className="text-sm text-muted-foreground">Activos</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">Activos</p>
-                </div>
 
-                <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                            <Clock className="h-5 w-5 text-yellow-500" />
+                    <div className="p-6 bg-card rounded-2xl border border-border">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-10 w-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                                <Clock className="h-5 w-5 text-yellow-500" />
+                            </div>
+                            <span className="text-2xl font-bold text-foreground">{stats?.byStatus.PENDING || 0}</span>
                         </div>
-                        <span className="text-2xl font-bold text-foreground">{stats?.byStatus.PENDING || 0}</span>
+                        <p className="text-sm text-muted-foreground">Pendientes</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">Pendientes</p>
-                </div>
 
-                <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                            <TrendingDown className="h-5 w-5 text-red-500" />
+                    <div className="p-6 bg-card rounded-2xl border border-border">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                                <TrendingDown className="h-5 w-5 text-red-500" />
+                            </div>
+                            <span className="text-2xl font-bold text-foreground">{stats?.byStatus.UNSUBSCRIBED || 0}</span>
                         </div>
-                        <span className="text-2xl font-bold text-foreground">{stats?.byStatus.UNSUBSCRIBED || 0}</span>
+                        <p className="text-sm text-muted-foreground">Cancelados</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">Cancelados</p>
-                </div>
 
-                <div className="p-6 bg-card rounded-2xl border border-border">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                            <Crown className="h-5 w-5 text-amber-500" />
+                    <div className="p-6 bg-card rounded-2xl border border-border">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                <Crown className="h-5 w-5 text-amber-500" />
+                            </div>
+                            <span className="text-2xl font-bold text-foreground">{stats?.byTier.PREMIUM || 0}</span>
                         </div>
-                        <span className="text-2xl font-bold text-foreground">{stats?.byTier.PREMIUM || 0}</span>
+                        <p className="text-sm text-muted-foreground">Premium</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">Premium</p>
-                </div>
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-wrap gap-4 items-center">
-                <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Filtros:</span>
                 </div>
 
-                <select
-                    value={statusFilter}
-                    onChange={(e) => { setStatusFilter(e.target.value as StatusFilter); setPage(1); }}
-                    className="px-3 py-2 bg-card border border-border rounded-xl text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                    <option value="">Todos los estados</option>
-                    <option value="ACTIVE">Activos</option>
-                    <option value="PENDING">Pendientes</option>
-                    <option value="UNSUBSCRIBED">Cancelados</option>
-                    <option value="BOUNCED">Rebotados</option>
-                </select>
+                {/* Search & Filters */}
+                <div className="flex flex-col md:flex-row gap-4">
+                    {/* Search */}
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <input
+                            type="text"
+                            placeholder="Buscar por email o nombre..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                    </div>
 
-                <select
-                    value={tierFilter}
-                    onChange={(e) => { setTierFilter(e.target.value as TierFilter); setPage(1); }}
-                    className="px-3 py-2 bg-card border border-border rounded-xl text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                    <option value="">Todos los planes</option>
-                    <option value="FREE">Gratis</option>
-                    <option value="PREMIUM">Premium</option>
-                </select>
-
-                {(statusFilter || tierFilter) && (
-                    <button
-                        onClick={() => { setStatusFilter(''); setTierFilter(''); setPage(1); }}
-                        className="text-sm text-primary hover:underline"
-                    >
-                        Limpiar filtros
-                    </button>
-                )}
-            </div>
-
-            {/* Subscribers Table */}
-            <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-muted">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Email</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Nombre</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Estado</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Plan</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Fuente</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                            {isLoadingTable ? (
-                                [...Array(5)].map((_, i) => (
-                                    <tr key={i} className="animate-pulse">
-                                        <td className="px-6 py-4"><div className="h-4 w-40 bg-muted rounded" /></td>
-                                        <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
-                                        <td className="px-6 py-4"><div className="h-4 w-16 bg-muted rounded" /></td>
-                                        <td className="px-6 py-4"><div className="h-4 w-20 bg-muted rounded" /></td>
-                                        <td className="px-6 py-4"><div className="h-4 w-20 bg-muted rounded" /></td>
-                                        <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
-                                    </tr>
-                                ))
-                            ) : subscribers.length > 0 ? (
-                                subscribers.map((subscriber) => (
-                                    <tr key={subscriber.id} className="hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <Mail className="h-4 w-4 text-muted-foreground" />
-                                                <span className="text-foreground">{subscriber.email}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-foreground">{subscriber.name || '-'}</td>
-                                        <td className="px-6 py-4">{getStatusBadge(subscriber.status)}</td>
-                                        <td className="px-6 py-4">
-                                            <select
-                                                value={subscriber.tier}
-                                                onChange={(e) => handleTierChange(subscriber.id, e.target.value as 'FREE' | 'PREMIUM')}
-                                                disabled={subscriber.status !== 'ACTIVE'}
-                                                className="px-2 py-1 bg-muted border border-border rounded-lg text-sm text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                <option value="FREE">Gratis</option>
-                                                <option value="PREMIUM">Premium</option>
-                                            </select>
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground text-sm">{subscriber.source || '-'}</td>
-                                        <td className="px-6 py-4 text-muted-foreground text-sm">
-                                            {format(new Date(subscriber.createdAt), "d MMM yyyy", { locale: es })}
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                                        No se encontraron suscriptores
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-                        <p className="text-sm text-muted-foreground">
-                            Mostrando página {page} de {totalPages} ({total} suscriptores)
-                        </p>
+                    {/* Filters */}
+                    <div className="flex flex-wrap gap-4 items-center">
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                                className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <ChevronLeft className="h-5 w-5" />
-                            </button>
-                            <span className="text-sm text-foreground px-3">{page}</span>
-                            <button
-                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages}
-                                className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <ChevronRight className="h-5 w-5" />
-                            </button>
+                            <Filter className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Filtros:</span>
                         </div>
+
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => { setStatusFilter(e.target.value as StatusFilter); setPage(1); }}
+                            className="px-3 py-2 bg-card border border-border rounded-xl text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                            <option value="">Todos los estados</option>
+                            <option value="ACTIVE">Activos</option>
+                            <option value="PENDING">Pendientes</option>
+                            <option value="UNSUBSCRIBED">Cancelados</option>
+                            <option value="BOUNCED">Rebotados</option>
+                        </select>
+
+                        <select
+                            value={tierFilter}
+                            onChange={(e) => { setTierFilter(e.target.value as TierFilter); setPage(1); }}
+                            className="px-3 py-2 bg-card border border-border rounded-xl text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                            <option value="">Todos los planes</option>
+                            <option value="FREE">Gratis</option>
+                            <option value="PREMIUM">Premium</option>
+                        </select>
+
+                        {(statusFilter || tierFilter || searchQuery) && (
+                            <button
+                                onClick={() => { setStatusFilter(''); setTierFilter(''); setSearchQuery(''); setPage(1); }}
+                                className="text-sm text-primary hover:underline"
+                            >
+                                Limpiar filtros
+                            </button>
+                        )}
                     </div>
-                )}
+                </div>
+
+                {/* Subscribers Table */}
+                <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-muted">
+                                <tr>
+                                    <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Email</th>
+                                    <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Nombre</th>
+                                    <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Estado</th>
+                                    <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Plan</th>
+                                    <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Fuente</th>
+                                    <th className="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {isLoadingTable ? (
+                                    [...Array(5)].map((_, i) => (
+                                        <tr key={i} className="animate-pulse">
+                                            <td className="px-6 py-4"><div className="h-4 w-40 bg-muted rounded" /></td>
+                                            <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
+                                            <td className="px-6 py-4"><div className="h-4 w-16 bg-muted rounded" /></td>
+                                            <td className="px-6 py-4"><div className="h-4 w-20 bg-muted rounded" /></td>
+                                            <td className="px-6 py-4"><div className="h-4 w-20 bg-muted rounded" /></td>
+                                            <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
+                                        </tr>
+                                    ))
+                                ) : subscribers.length > 0 ? (
+                                    subscribers
+                                        .filter((subscriber) => {
+                                            if (!searchQuery) return true;
+                                            const query = searchQuery.toLowerCase();
+                                            return (
+                                                subscriber.email?.toLowerCase().includes(query) ||
+                                                subscriber.name?.toLowerCase().includes(query)
+                                            );
+                                        })
+                                        .map((subscriber) => (
+                                            <tr key={subscriber.id} className="hover:bg-muted/50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <Mail className="h-4 w-4 text-muted-foreground" />
+                                                        <span className="text-foreground">{subscriber.email}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-foreground">{subscriber.name || '-'}</td>
+                                                <td className="px-6 py-4">{getStatusBadge(subscriber.status)}</td>
+                                                <td className="px-6 py-4">
+                                                    <select
+                                                        value={subscriber.tier}
+                                                        onChange={(e) => handleTierChange(subscriber.id, e.target.value as 'FREE' | 'PREMIUM')}
+                                                        disabled={subscriber.status !== 'ACTIVE'}
+                                                        className="px-2 py-1 bg-muted border border-border rounded-lg text-sm text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        <option value="FREE">Gratis</option>
+                                                        <option value="PREMIUM">Premium</option>
+                                                    </select>
+                                                </td>
+                                                <td className="px-6 py-4 text-muted-foreground text-sm">{subscriber.source || '-'}</td>
+                                                <td className="px-6 py-4 text-muted-foreground text-sm">
+                                                    {format(new Date(subscriber.createdAt), "d MMM yyyy", { locale: es })}
+                                                </td>
+                                            </tr>
+                                        ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                                            No se encontraron suscriptores
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+                            <p className="text-sm text-muted-foreground">
+                                Mostrando página {page} de {totalPages} ({total} suscriptores)
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <ChevronLeft className="h-5 w-5" />
+                                </button>
+                                <span className="text-sm text-foreground px-3">{page}</span>
+                                <button
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                    className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <ChevronRight className="h-5 w-5" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </RoleGuard >
     );
 }
