@@ -1,12 +1,25 @@
 import './globals.css'
-import { Providers } from "./providers";
-import NavMenu from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/components/auth/AuthProvider"
 
 export const metadata = {
-  title: 'Revepsic',
-  description: 'Explora la ciencia detrás de la mente en nuestro blog de divulgación psicológica. Descubre investigaciones, tendencias y enfoques innovadores de expertos en psicología. Sumérgete en el fascinante mundo de la mente y la conducta.',
- 
+  title: 'REVEPSIC - Red Venezolana Para el Avance de la Psicología Científica',
+  description: 'Explora la ciencia detrás de la mente en nuestro blog de divulgación psicológica. Descubre investigaciones, tendencias y enfoques innovadores de expertos en psicología.',
+  keywords: ['psicología', 'psicología científica', 'Venezuela', 'investigación', 'evidencia'],
+  authors: [{ name: 'REVEPSIC' }],
+  openGraph: {
+    title: 'REVEPSIC - Red Venezolana Para el Avance de la Psicología Científica',
+    description: 'Líderes en la difusión y divulgación de la psicología basada en evidencia en Venezuela.',
+    url: 'https://www.revepsic.com',
+    siteName: 'REVEPSIC',
+    locale: 'es_VE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'REVEPSIC',
+    description: 'Red Venezolana Para el Avance de la Psicología Científica',
+  },
 }
 
 export default function RootLayout({
@@ -15,18 +28,22 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="dark:bg-slate-800">
-      <Providers>
-      <header >
-            <NavMenu />
-          </header>
-        <main className="min-h-screen ">
-          {children}
-        </main>
-        <Footer/>
-        </Providers>
+    <html lang="es" suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange={false}
+          >
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )
 }
+
+
+

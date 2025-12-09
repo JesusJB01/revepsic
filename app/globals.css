@@ -1,3 +1,125 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Design System - REVEPSIC */
+:root {
+  /* Colors - Light Mode */
+  --background: 248 250 252; /* slate-50 */
+  --foreground: 15 23 42; /* slate-950 */
+  
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  
+  --primary: 245 158 11; /* amber-500 */
+  --primary-foreground: 15 23 42;
+  
+  --secondary: 236 72 153; /* pink-500 */
+  --secondary-foreground: 255 255 255;
+  
+  --muted: 241 245 249; /* slate-100 */
+  --muted-foreground: 100 116 139; /* slate-500 */
+  
+  --accent: 241 245 249;
+  --accent-foreground: 15 23 42;
+  
+  --border: 226 232 240; /* slate-200 */
+  --input: 226 232 240;
+  --ring: 245 158 11;
+  
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* Colors - Dark Mode */
+  --background: 15 23 42; /* slate-950 */
+  --foreground: 248 250 252; /* slate-50 */
+  
+  --card: 30 41 59; /* slate-800 */
+  --card-foreground: 248 250 252;
+  
+  --primary: 251 191 36; /* amber-400 */
+  --primary-foreground: 15 23 42;
+  
+  --secondary: 244 114 182; /* pink-400 */
+  --secondary-foreground: 15 23 42;
+  
+  --muted: 51 65 85; /* slate-700 */
+  --muted-foreground: 148 163 184; /* slate-400 */
+  
+  --accent: 51 65 85;
+  --accent-foreground: 248 250 252;
+  
+  --border: 51 65 85; /* slate-700 */
+  --input: 51 65 85;
+  --ring: 251 191 36;
+}
+
+/* Base Styles */
+* {
+  border-color: rgb(var(--border));
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Utility Classes */
+.bg-background { background-color: rgb(var(--background)); }
+.bg-card { background-color: rgb(var(--card)); }
+.bg-muted { background-color: rgb(var(--muted)); }
+.bg-primary { background-color: rgb(var(--primary)); }
+.bg-secondary { background-color: rgb(var(--secondary)); }
+
+.text-foreground { color: rgb(var(--foreground)); }
+.text-card-foreground { color: rgb(var(--card-foreground)); }
+.text-muted-foreground { color: rgb(var(--muted-foreground)); }
+.text-primary { color: rgb(var(--primary)); }
+.text-secondary { color: rgb(var(--secondary)); }
+
+.border-border { border-color: rgb(var(--border)); }
+
+/* Gradient Utilities */
+.gradient-text {
+  background: linear-gradient(135deg, rgb(var(--secondary)) 0%, rgb(var(--primary)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, rgb(var(--secondary)) 0%, rgb(var(--primary)) 100%);
+}
+
+/* Smooth Transitions */
+.transition-theme {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
