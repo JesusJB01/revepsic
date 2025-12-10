@@ -127,7 +127,6 @@ export default function NewPostPage() {
                 isPremium: formData.isPremium,
                 tagIds: formData.tagIds,
             };
-            console.log("Creating post with data:", postData);
             const response = await postsApi.create(postData);
 
             if (response.success && response.data) {
@@ -135,7 +134,6 @@ export default function NewPostPage() {
 
                 // Step 2: Upload cover image if selected
                 if (coverFile) {
-                    console.log("Uploading cover for post:", postId);
                     const uploadRes = await uploadApi.uploadCover(postId, coverFile);
                     if (!uploadRes.success) {
                         console.error("Failed to upload cover:", uploadRes.message);
@@ -145,7 +143,6 @@ export default function NewPostPage() {
                 router.push("/admin/posts");
             } else {
                 const errorMsg = response.message || response.error || "Error al crear el post";
-                console.error("Error creating post:", errorMsg);
                 alert(errorMsg);
             }
         } catch (err) {

@@ -144,17 +144,10 @@ export const authApi = {
       { method: 'POST', body: { email, password } }
     );
     
-    console.log('[API] Login response success:', response.success);
-    
     if (response.success && response.data) {
-      // Tokens are in data.tokens
       const tokens = response.data.tokens;
-      
       if (tokens?.accessToken && tokens?.refreshToken) {
-        console.log('[API] Saving tokens...');
         setTokens(tokens.accessToken, tokens.refreshToken);
-      } else {
-        console.error('[API] Tokens structure not found:', response.data);
       }
     }
     return response;
@@ -387,10 +380,8 @@ async function uploadFetch<T>(endpoint: string, formData: FormData): Promise<Api
     
     // If 401, try to refresh token
     if (response.status === 401) {
-      console.log('[Upload] Token expired, attempting refresh...');
       const newToken = await refreshAccessToken();
       if (newToken) {
-        console.log('[Upload] Token refreshed, retrying upload...');
         response = await makeRequest(newToken);
       } else {
         clearTokens();
@@ -434,6 +425,75 @@ export const uploadApi = {
   deleteImage: async (imageId: string): Promise<ApiResponse<void>> => {
     return apiFetch(`/upload/image/${imageId}`, { method: 'DELETE', auth: true });
   },
+
+  uploadMemberPhoto: async (memberId: string, file: File): Promise<ApiResponse<{ url: string }>> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return uploadFetch(`/upload/member/${memberId}`, formData);
+  },
+};
+
+// ============ MEMBERS API ============
+export type MemberCategory = "FUNDADORES" | "TITULARES" | "ASOCIADOS";
+
+export interface Member {
+  id: string;
+  slug: string;
+  name: string;
+  position: string;
+  category: MemberCategory;
+  bio: string;
+  image: string;
+  whatsapp: string | null;
+  website: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  twitter: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMemberDto {
+  name: string;
+  position: string;
+  category: MemberCategory;
+  bio: string;
+  image: string;
+  whatsapp?: string;
+  website?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+}
+
+export interface UpdateMemberDto extends Partial<CreateMemberDto> {}
+
+export const membersApi = {
+  // Public endpoints
+  getAll: (category?: MemberCategory) => {
+    const query = category ? `?category=${category}` : '';
+    return apiFetch<Member[]>(`/members${query}`);
+  },
+
+  getBySlug: (slug: string) => apiFetch<Member>(`/members/${slug}`),
+
+  getSlugs: () => apiFetch<string[]>('/members/slugs'),
+
+  // Admin endpoints
+  getAllAdmin: () => apiFetch<Member[]>('/members/admin', { auth: true }),
+
+  create: (data: CreateMemberDto) =>
+    apiFetch<Member>('/members', { method: 'POST', body: data, auth: true }),
+
+  update: (id: string, data: UpdateMemberDto) =>
+    apiFetch<Member>(`/members/${id}`, { method: 'PUT', body: data, auth: true }),
+
+  delete: (id: string) =>
+    apiFetch(`/members/${id}`, { method: 'DELETE', auth: true }),
+
+  toggle: (id: string) =>
+    apiFetch<Member>(`/members/${id}/toggle`, { method: 'PATCH', auth: true }),
 };
 
 // Export helpers

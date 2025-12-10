@@ -1,22 +1,19 @@
-"use client";
 import React from "react";
-import Image from "next/image";
+import { Award, Users, Star } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import TeamMemberCard from "@/components/TeamMemberCard";
+import { FadeIn } from "@/components/animations";
+import { getMembersGrouped, type TeamMember } from "@/lib/data/team";
+import TeamSection from "@/components/TeamSection";
 
-const team = [
-  { name: "Alejandro Becerra", position: "Presidente", src: "/alejandrobecerra.png" },
-  { name: "Jesus Jimenez", position: "Vicepresidente", src: "/jesus.jpg" },
-  { name: "Adonis Solis", position: "Secretaria", src: "/adonis.jpg" },
-  { name: "Maria Perez", position: "CEO", src: "/maria.jpg" },
-  { name: "Nelson Ledezma", position: "Developer", src: "/nelson.jpg" },
-  { name: "Luis Madera", position: "Developer", src: "/luismadera.jpg" },
-  { name: "Jhonnathan Sulbaran", position: "Developer", src: "/jonnathansulbaran.jpg" },
-  { name: "Wilfredo Diaz", position: "Developer", src: "/wilfredodiaz.jpg" },
-  { name: "Ana Rodriguez", position: "Developer", src: "/anarodriguez.jpg" },
-  { name: "Lady Molina", position: "Developer", src: "/lady.jpg" },
-];
+// Dynamic page - uses cache tags for on-demand revalidation
+// In development, always fetches fresh data (no cache)
+// In production, uses on-demand revalidation via /api/revalidate
 
-export default function EquipoPage() {
+export default async function EquipoPage() {
+  // Fetch members from API (server-side)
+  const { fundadores, titulares, asociados } = await getMembersGrouped();
+
   return (
     <>
       <PageHeader
@@ -26,38 +23,72 @@ export default function EquipoPage() {
         imageAlt="Equipo REVEPSIC"
       />
 
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              El <span className="text-primary">Equipo</span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Profesionales comprometidos con el avance de la psicología científica en Venezuela.
-            </p>
-          </div>
+      <section className="py-16 md:py-24 relative overflow-hidden">
+        {/* Animated background elements - moved to client component */}
+        <TeamBackgroundAnimations />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {team.map((member, index) => (
-              <div
-                key={index}
-                className="group text-center"
-              >
-                <div className="relative w-24 h-24 md:w-28 md:h-28 mx-auto mb-4 rounded-full overflow-hidden border-4 border-border group-hover:border-primary transition-colors">
-                  <Image
-                    src={member.src}
-                    alt={member.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
-                <p className="text-xs text-muted-foreground">{member.position}</p>
-              </div>
-            ))}
-          </div>
+        <div className="container relative z-10">
+          {/* Intro */}
+          <FadeIn>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                El <span className="gradient-text">Equipo</span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Profesionales comprometidos con el avance de la psicología científica en Venezuela.
+                Cada miembro aporta su experiencia única para construir una comunidad más fuerte.
+              </p>
+            </div>
+          </FadeIn>
+
+          {/* Fundadores Section */}
+          {fundadores.length > 0 && (
+            <TeamSection
+              title="Fundadores"
+              subtitle="Los visionarios que dieron inicio a REVEPSIC"
+              icon={<Award className="w-5 h-5" />}
+              members={fundadores}
+              gradientFrom="from-pink-500"
+              gradientTo="to-rose-600"
+            />
+          )}
+
+          {/* Titulares Section */}
+          {titulares.length > 0 && (
+            <TeamSection
+              title="Miembros Titulares"
+              subtitle="Profesionales activos que impulsan nuestra misión"
+              icon={<Star className="w-5 h-5" />}
+              members={titulares}
+              gradientFrom="from-amber-500"
+              gradientTo="to-orange-600"
+            />
+          )}
+
+          {/* Asociados Section */}
+          {asociados.length > 0 && (
+            <TeamSection
+              title="Miembros Asociados"
+              subtitle="Profesionales de la psicología que forman parte de nuestra red"
+              icon={<Users className="w-5 h-5" />}
+              members={asociados}
+              gradientFrom="from-violet-500"
+              gradientTo="to-purple-600"
+            />
+          )}
         </div>
       </section>
     </>
+  );
+}
+
+// Client component for animations
+function TeamBackgroundAnimations() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-pink-500/5 to-amber-500/5 rounded-full blur-3xl" />
+    </div>
   );
 }

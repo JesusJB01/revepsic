@@ -39,9 +39,6 @@ export default async function BlogPage({ searchParams }: Props) {
   let pagination = { page: 1, totalPages: 1, total: 0, limit: 6 };
 
   if (responseData) {
-    // DEBUG: Ver estructura de respuesta
-    console.log('[Blog Page] API Response:', JSON.stringify(responseData, null, 2).slice(0, 500));
-
     // Si responseData tiene .data (estructura anidada del backend)
     if (responseData.data && Array.isArray(responseData.data)) {
       posts = responseData.data;
@@ -51,8 +48,6 @@ export default async function BlogPage({ searchParams }: Props) {
       posts = responseData;
     }
   }
-
-  console.log('[Blog Page] Posts:', posts.length, 'Pagination:', pagination);
 
   const tagsData = tagsResponse?.data;
   const tags: Tag[] = Array.isArray(tagsData) ? tagsData : [];

@@ -90,19 +90,18 @@ export default function AuthorsAdminPage() {
         if (formData.bio) authorData.bio = formData.bio;
         if (formData.email) authorData.email = formData.email;
 
-        console.log("Sending author data:", authorData);
-
         try {
             if (editingAuthor) {
                 // Update existing author
                 const response = await authorsApi.update(editingAuthor.id, authorData);
-                console.log("Update response:", response);
                 if (response.success) {
                     // Upload avatar if selected
                     if (avatarFile) {
                         setIsUploading(true);
                         const uploadRes = await uploadApi.uploadAvatar(editingAuthor.id, avatarFile, 'author');
-                        console.log("Upload avatar response:", uploadRes);
+                        if (!uploadRes.success) {
+                            console.error('Avatar upload failed');
+                        }
                         setIsUploading(false);
                     }
                     fetchAuthors();
@@ -113,13 +112,14 @@ export default function AuthorsAdminPage() {
             } else {
                 // Create new author
                 const response = await authorsApi.create(authorData);
-                console.log("Create response:", response);
                 if (response.success && response.data) {
                     // Upload avatar if selected
                     if (avatarFile) {
                         setIsUploading(true);
                         const uploadRes = await uploadApi.uploadAvatar(response.data.id, avatarFile, 'author');
-                        console.log("Upload avatar response:", uploadRes);
+                        if (!uploadRes.success) {
+                            console.error('Avatar upload failed');
+                        }
                         setIsUploading(false);
                     }
                     fetchAuthors();

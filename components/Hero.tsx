@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Lottie from "lottie-react";
+import heroAnimation from "@/public/animations/hero-animation.json";
 
 export default function Hero() {
   return (
@@ -101,14 +102,12 @@ export default function Hero() {
             className="relative"
           >
             <div className="relative aspect-square max-w-lg mx-auto">
-              {/* Glow effect behind image */}
+              {/* Glow effect behind animation */}
               <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/30 to-amber-500/30 rounded-full blur-3xl scale-75" />
-              <Image
-                src="/hero-illustration.png"
-                alt="Psicología Científica"
-                fill
-                className="object-contain drop-shadow-2xl relative z-10"
-                priority
+              <Lottie
+                animationData={heroAnimation}
+                loop={true}
+                className="w-full h-full relative z-10 drop-shadow-2xl"
               />
             </div>
           </motion.div>

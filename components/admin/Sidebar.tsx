@@ -9,6 +9,7 @@ import {
     FileText,
     Users,
     UserCircle,
+    UsersRound,
     Tags,
     Mail,
     BarChart3,
@@ -22,6 +23,7 @@ const navItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard, roles: ['ADMIN', 'EDITOR', 'VIEWER'] },
     { name: "Posts", href: "/admin/posts", icon: FileText, roles: ['ADMIN', 'EDITOR'] },
     { name: "Autores", href: "/admin/autores", icon: UserCircle, roles: ['ADMIN'] },
+    { name: "Miembros", href: "/admin/miembros", icon: UsersRound, roles: ['ADMIN'] },
     { name: "Tags", href: "/admin/tags", icon: Tags, roles: ['ADMIN'] },
     { name: "Usuarios", href: "/admin/usuarios", icon: Users, roles: ['ADMIN'] },
     { name: "Suscriptores", href: "/admin/suscriptores", icon: Mail, roles: ['ADMIN'] },
@@ -130,8 +132,8 @@ export default function AdminSidebar() {
                             <div className="flex items-center gap-2 mb-1">
                                 <p className="font-medium text-foreground text-sm truncate">{user.name}</p>
                                 <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${user.role === 'ADMIN' ? 'bg-red-500/10 text-red-500' :
-                                        user.role === 'EDITOR' ? 'bg-blue-500/10 text-blue-500' :
-                                            'bg-gray-500/10 text-gray-500'
+                                    user.role === 'EDITOR' ? 'bg-blue-500/10 text-blue-500' :
+                                        'bg-gray-500/10 text-gray-500'
                                     }`}>
                                     {user.role}
                                 </span>

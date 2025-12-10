@@ -61,12 +61,30 @@ export async function POST(request: NextRequest) {
         console.log('[Revalidate] Authors revalidated');
         break;
 
+      case 'member':
+        // Revalidate members cache
+        revalidateTag('members');
+        revalidateTag('members-all');
+        
+        if (slug) {
+          revalidateTag(`member-${slug}`);
+          revalidatePath(`/m/${slug}`);
+        }
+        
+        // Revalidate team page
+        revalidatePath('/equipo');
+        
+        console.log('[Revalidate] Members revalidated');
+        break;
+
       case 'all':
         // Revalidar todo
         revalidateTag('posts');
         revalidateTag('tags');
         revalidateTag('authors');
+        revalidateTag('members');
         revalidatePath('/blog');
+        revalidatePath('/equipo');
         revalidatePath('/');
         
         console.log('[Revalidate] All content revalidated');

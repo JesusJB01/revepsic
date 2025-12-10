@@ -20,7 +20,7 @@
   --secondary-foreground: 255 255 255;
   
   --muted: 241 245 249; /* slate-100 */
-  --muted-foreground: 100 116 139; /* slate-500 */
+  --muted-foreground: 71 85 105; /* slate-600 - improved contrast */
   
   --accent: 241 245 249;
   --accent-foreground: 15 23 42;
@@ -47,7 +47,7 @@
   --secondary-foreground: 15 23 42;
   
   --muted: 51 65 85; /* slate-700 */
-  --muted-foreground: 148 163 184; /* slate-400 */
+  --muted-foreground: 203 213 225; /* slate-300 - improved contrast */
   
   --accent: 51 65 85;
   --accent-foreground: 248 250 252;

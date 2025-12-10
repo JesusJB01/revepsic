@@ -11,6 +11,7 @@ const navLinks = [
     { name: "Nosotros", href: "/nosotros" },
     { name: "Contacto", href: "/contacto" },
     { name: "Team", href: "/equipo" },
+    { name: "Únete", href: "/planes" },
     { name: "Blog", href: "/blog" },
 ];
 
@@ -52,8 +53,8 @@ export default function Navbar() {
                                     key={link.name}
                                     href={link.href}
                                     className={`text-sm font-medium transition-colors hover:text-primary ${pathname === link.href
-                                            ? "text-primary"
-                                            : "text-muted-foreground"
+                                        ? "text-primary"
+                                        : "text-muted-foreground"
                                         }`}
                                 >
                                     {link.name}
@@ -136,8 +137,8 @@ export default function Navbar() {
                                     href={link.href}
                                     onClick={() => setIsMenuOpen(false)}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${pathname === link.href
-                                            ? "text-primary bg-muted"
-                                            : "text-muted-foreground"
+                                        ? "text-primary bg-muted"
+                                        : "text-muted-foreground"
                                         }`}
                                 >
                                     {link.name}

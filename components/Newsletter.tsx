@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Lottie from "lottie-react";
 import { FadeIn } from "./animations";
 import { newsletterApi } from "@/lib/api";
+import newsletterAnimation from "@/public/animations/Newslettert.json";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -148,11 +149,10 @@ export default function Newsletter() {
               <div className="relative aspect-square max-w-md mx-auto">
                 {/* Glow */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/20 to-amber-500/20 rounded-full blur-3xl scale-75" />
-                <Image
-                  src="/newsletter-illustration.png"
-                  alt="Newsletter"
-                  fill
-                  className="object-contain drop-shadow-2xl relative z-10"
+                <Lottie
+                  animationData={newsletterAnimation}
+                  loop={true}
+                  className="w-full h-full relative z-10 drop-shadow-2xl"
                 />
               </div>
             </div>

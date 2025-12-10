@@ -35,18 +35,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             try {
-                console.log('[Auth] Checking existing session...');
                 const response = await authApi.getMe();
 
                 if (response.success && response.data) {
-                    console.log('[Auth] Session valid:', response.data);
                     setUser(response.data as User);
                 } else {
-                    console.log('[Auth] Session invalid, clearing tokens');
                     clearTokens();
                 }
-            } catch (error) {
-                console.error('[Auth] Session check failed:', error);
+            } catch {
                 clearTokens();
             }
 
@@ -58,24 +54,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = async (email: string, password: string) => {
         try {
-            console.log('[Auth] Attempting login for:', email);
             const response = await authApi.login(email, password);
-            console.log('[Auth] Login response:', response);
 
             if (response.success && response.data) {
-                // User is in response.data.user
                 const userData = (response.data as { user?: User }).user;
                 if (userData) {
                     setUser(userData);
-                    console.log('[Auth] User set from login response:', userData);
                 }
                 return { success: true };
             }
 
-            console.log('[Auth] Login failed:', response.message);
             return { success: false, message: response.message || 'Credenciales incorrectas' };
-        } catch (error) {
-            console.error('[Auth] Login error:', error);
+        } catch {
             return { success: false, message: 'Error de conexión con el servidor' };
         }
     };
