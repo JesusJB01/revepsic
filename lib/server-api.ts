@@ -130,3 +130,5 @@ export const preloadAuthor = (slug: string) => {
 // Re-export types from blog-utils for convenience
 export type { Post, Tag, Author, Pagination } from './blog-utils';
 export type { PostsResponse, TagsResponse };
+export { estimateReadTime } from './blog-utils';
+

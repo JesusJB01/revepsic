@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
   const secret = request.headers.get('x-revalidate-secret');
   
   if (secret !== process.env.REVALIDATE_SECRET) {
-    console.log('[Revalidate] Invalid secret provided');
     return NextResponse.json(
       { success: false, error: 'Invalid secret' },
       { status: 401 }
@@ -15,79 +14,58 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { type, slug, action } = body;
-
-    console.log(`[Revalidate] Received: type=${type}, slug=${slug}, action=${action}`);
+    const { type, slug } = body;
 
     switch (type) {
       case 'post':
-        // Revalidar tag general de posts
-        revalidateTag('posts');
-        
-        // Si hay slug específico, revalidar ese post
+        await revalidateTag('posts', 'max');
         if (slug) {
-          revalidateTag(`post-${slug}`);
-          revalidatePath(`/blog/${slug}`);
+          await revalidateTag(`post-${slug}`, 'max');
+          await revalidatePath(`/blog/${slug}`, 'page');
         }
-        
-        // Revalidar páginas que muestran posts
-        revalidatePath('/blog');
-        revalidatePath('/'); // Homepage puede mostrar posts recientes
-        
-        console.log('[Revalidate] Posts revalidated');
+        await revalidatePath('/blog', 'page');
+        await revalidatePath('/', 'page');
         break;
 
       case 'tag':
-        revalidateTag('tags');
-        revalidatePath('/blog');
-        
+        await revalidateTag('tags', 'max');
+        await revalidatePath('/blog', 'page');
         if (slug) {
-          revalidateTag(`tag-${slug}`);
-          revalidatePath(`/blog/categoria/${slug}`);
+          await revalidateTag(`tag-${slug}`, 'max');
+          await revalidatePath(`/blog/categoria/${slug}`, 'page');
         }
-        
-        console.log('[Revalidate] Tags revalidated');
         break;
 
       case 'author':
-        revalidateTag('authors');
-        
+        await revalidateTag('authors', 'max');
         if (slug) {
-          revalidateTag(`author-${slug}`);
-          revalidateTag(`author-${slug}-posts`);
-          revalidatePath(`/blog/autor/${slug}`);
+          await revalidateTag(`author-${slug}`, 'max');
+          await revalidateTag(`author-${slug}-posts`, 'max');
+          await revalidatePath(`/blog/autor/${slug}`, 'page');
         }
-        
-        console.log('[Revalidate] Authors revalidated');
         break;
 
       case 'member':
-        // Revalidate members cache
-        revalidateTag('members');
-        revalidateTag('members-all');
-        
+        await revalidateTag('members', 'max');
+        await revalidateTag('members-all', 'max');
         if (slug) {
-          revalidateTag(`member-${slug}`);
-          revalidatePath(`/m/${slug}`);
+          await revalidateTag(`member-${slug}`, 'max');
+          await revalidatePath(`/m/${slug}`, 'page');
+          await revalidatePath(`/directorio/${slug}`, 'page');
         }
-        
-        // Revalidate team page
-        revalidatePath('/equipo');
-        
-        console.log('[Revalidate] Members revalidated');
+        await revalidatePath('/equipo', 'page');
+        await revalidatePath('/directorio', 'page');
         break;
 
       case 'all':
-        // Revalidar todo
-        revalidateTag('posts');
-        revalidateTag('tags');
-        revalidateTag('authors');
-        revalidateTag('members');
-        revalidatePath('/blog');
-        revalidatePath('/equipo');
-        revalidatePath('/');
-        
-        console.log('[Revalidate] All content revalidated');
+        await revalidateTag('posts', 'max');
+        await revalidateTag('tags', 'max');
+        await revalidateTag('authors', 'max');
+        await revalidateTag('members', 'max');
+        await revalidatePath('/blog', 'page');
+        await revalidatePath('/equipo', 'page');
+        await revalidatePath('/directorio', 'page');
+        await revalidatePath('/', 'page');
         break;
 
       default:
@@ -113,49 +91,32 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// También permitir GET para testing (solo en desarrollo)
+// GET for development testing only
 export async function GET(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'GET not allowed in production' },
-      { status: 405 }
-    );
+    return NextResponse.json({ error: 'GET not allowed in production' }, { status: 405 });
   }
 
   const searchParams = request.nextUrl.searchParams;
   const type = searchParams.get('type') || 'all';
   const slug = searchParams.get('slug');
-
-  // Simular el POST
-  const mockRequest = {
-    headers: { get: () => process.env.REVALIDATE_SECRET },
-    json: async () => ({ type, slug }),
-  } as unknown as NextRequest;
-
-  // Esta es solo para testing - en producción usar POST
-  console.log('[Revalidate] GET request (dev only):', { type, slug });
   
   try {
     switch (type) {
       case 'post':
-        revalidateTag('posts');
-        if (slug) revalidatePath(`/blog/${slug}`);
-        revalidatePath('/blog');
+        await revalidateTag('posts', 'max');
+        if (slug) await revalidatePath(`/blog/${slug}`, 'page');
+        await revalidatePath('/blog', 'page');
         break;
       case 'all':
-        revalidateTag('posts');
-        revalidateTag('tags');
-        revalidateTag('authors');
-        revalidatePath('/blog');
+        await revalidateTag('posts', 'max');
+        await revalidateTag('tags', 'max');
+        await revalidateTag('authors', 'max');
+        await revalidatePath('/blog', 'page');
         break;
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Revalidated (dev mode)',
-      type,
-      slug,
-    });
+    return NextResponse.json({ success: true, message: 'Revalidated (dev mode)', type, slug });
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }

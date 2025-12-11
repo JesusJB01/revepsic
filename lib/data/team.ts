@@ -1,7 +1,7 @@
 // Team Members Data - Server-side API functions
 // These functions fetch data from the backend API for use in Server Components
 
-import type { Member, MemberCategory } from "@/lib/api";
+import type { Member, MemberCategory, DirectoryMember, DirectoryFilters } from "@/lib/api";
 
 // Use API_URL (server-only) first, then fall back to NEXT_PUBLIC_API_URL
 // This ensures server-side fetches use the correct backend URL
@@ -9,7 +9,7 @@ const API_BASE_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "
 const isDev = process.env.NODE_ENV === "development";
 
 // Re-export types from api.ts for convenience
-export type { Member, MemberCategory };
+export type { Member, MemberCategory, DirectoryMember, DirectoryFilters };
 
 // Legacy type alias for backwards compatibility with existing components
 export type TeamMember = Member & {
@@ -167,3 +167,69 @@ export async function getMembersGrouped(): Promise<{
     asociados: allMembers.filter((m) => m.category === "ASOCIADOS"),
   };
 }
+
+// =============================================================================
+// DIRECTORY DATA FETCHING FUNCTIONS
+// For the public psychologist directory with full profile data
+// =============================================================================
+
+/**
+ * Get all members from the directory (full data) with optional filters
+ */
+export async function getDirectoryMembers(filters?: DirectoryFilters): Promise<DirectoryMember[]> {
+  try {
+    const query = new URLSearchParams();
+    if (filters?.city) query.set('city', filters.city);
+    if (filters?.specialty) query.set('specialty', filters.specialty);
+    if (filters?.therapy) query.set('therapy', filters.therapy);
+    if (filters?.category) query.set('category', filters.category);
+    if (filters?.consultationType) query.set('consultationType', filters.consultationType);
+    if (filters?.acceptsInsurance !== undefined) query.set('acceptsInsurance', String(filters.acceptsInsurance));
+    
+    const queryStr = query.toString();
+    const res = await fetch(
+      `${API_BASE_URL}/members/directory${queryStr ? `?${queryStr}` : ''}`,
+      getFetchOptions(["directory", "directory-list"])
+    );
+
+    if (!res.ok) {
+      console.error("Failed to fetch directory:", res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data)) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching directory:", error);
+    return [];
+  }
+}
+
+/**
+ * Get a single member from directory by slug (full data with comments)
+ */
+export async function getDirectoryMemberBySlug(slug: string): Promise<DirectoryMember | null> {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/members/directory/${slug}`,
+      getFetchOptions(["directory", `directory-${slug}`])
+    );
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    if (data.success && data.data) {
+      return data.data;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching directory member:", error);
+    return null;
+  }
+}
+

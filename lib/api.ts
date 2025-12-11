@@ -435,7 +435,68 @@ export const uploadApi = {
 
 // ============ MEMBERS API ============
 export type MemberCategory = "FUNDADORES" | "TITULARES" | "ASOCIADOS";
+export type SubscriptionPlan = "DIRECTORY_ONLY" | "ASOCIADO_PLUS" | "ASOCIADO_PRO";
+export type SubscriptionType = "MONTHLY" | "ANNUAL";
+export type ConsultationType = "PRESENCIAL" | "ONLINE" | "DOMICILIO";
 
+// Helper interfaces for complex fields
+export interface Education {
+  degree: string;
+  field: string;
+  institution: string;
+  country?: string;
+  year?: number;
+}
+
+export interface ServiceItem {
+  name: string;
+  price: number;
+  currency?: string;
+  duration?: string;
+}
+
+export interface MemberLocation {
+  name: string;
+  type: ConsultationType;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  phone?: string;
+  services?: ServiceItem[];
+}
+
+export interface PriceRange {
+  min: number;
+  max: number;
+  currency?: string;
+  notes?: string;
+}
+
+export interface ScheduleSlot {
+  start: string;
+  end: string;
+}
+
+export interface Schedule {
+  timezone?: string;
+  notes?: string;
+  slots?: Record<string, ScheduleSlot[]>;
+}
+
+export interface MemberComment {
+  id: string;
+  memberId: string;
+  authorName: string;
+  authorEmail?: string;
+  rating: number;
+  content?: string;
+  isApproved?: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// Basic member (returned by /members endpoints)
 export interface Member {
   id: string;
   slug: string;
@@ -454,23 +515,154 @@ export interface Member {
   updatedAt: string;
 }
 
+// Full member (returned by /directory endpoints)
+export interface DirectoryMember extends Member {
+  // Additional contact
+  phone: string | null;
+  email: string | null;
+  linkedin: string | null;
+  
+  // Location
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  
+  // Subscription
+  subscriptionPlan: SubscriptionPlan | null;
+  subscriptionType: SubscriptionType | null;
+  subscriptionStart: string | null;
+  subscriptionEnd: string | null;
+  isVerified: boolean;
+  memberSince: string | null;
+  
+  // Personal data
+  gender: string | null;
+  birthDate: string | null;
+  
+  // Professional profile
+  licenseNumber: string | null;
+  experienceYears: number | null;
+  profileDescription: string | null;
+  
+  // Specialization (arrays)
+  specialties: string[];
+  therapies: string[];
+  disorders: string[];
+  languages: string[];
+  targetAges: string[];
+  certifications: string[];
+  
+  // Education
+  education: Education[];
+  
+  // Consultation types
+  consultationTypes: ConsultationType[];
+  
+  // Insurance
+  acceptsInsurance: boolean;
+  insuranceProviders: string[];
+  
+  // Pricing
+  priceRange: PriceRange | null;
+  firstSessionFree: boolean;
+  
+  // Schedule
+  schedule: Schedule | null;
+  
+  // Multiple locations
+  locations: MemberLocation[];
+  
+  // Video
+  videoUrl: string | null;
+  
+  // Comments (for directory listing, only ratings)
+  comments?: MemberComment[];
+}
+
 export interface CreateMemberDto {
+  // Required
   name: string;
   position: string;
   category: MemberCategory;
   bio: string;
   image: string;
+  
+  // Contact (optional)
   whatsapp?: string;
+  phone?: string;
+  email?: string;
   website?: string;
   facebook?: string;
   instagram?: string;
   twitter?: string;
+  linkedin?: string;
+  
+  // Location (optional)
+  city?: string;
+  state?: string;
+  country?: string;
+  
+  // Subscription (optional)
+  subscriptionPlan?: SubscriptionPlan;
+  subscriptionType?: SubscriptionType;
+  subscriptionStart?: string;
+  subscriptionEnd?: string;
+  memberSince?: string;
+  
+  // Personal data (optional)
+  gender?: string;
+  birthDate?: string;
+  
+  // Professional profile (optional)
+  licenseNumber?: string;
+  experienceYears?: number;
+  profileDescription?: string;
+  
+  // Specialization arrays (optional)
+  specialties?: string[];
+  therapies?: string[];
+  disorders?: string[];
+  languages?: string[];
+  targetAges?: string[];
+  certifications?: string[];
+  
+  // Education (optional)
+  education?: Education[];
+  
+  // Consultation types (optional)
+  consultationTypes?: ConsultationType[];
+  
+  // Insurance (optional)
+  acceptsInsurance?: boolean;
+  insuranceProviders?: string[];
+  
+  // Pricing (optional)
+  priceRange?: PriceRange;
+  firstSessionFree?: boolean;
+  
+  // Schedule (optional)
+  schedule?: Schedule;
+  
+  // Locations (optional)
+  locations?: MemberLocation[];
+  
+  // Video (optional)
+  videoUrl?: string;
 }
 
 export interface UpdateMemberDto extends Partial<CreateMemberDto> {}
 
+export interface DirectoryFilters {
+  city?: string;
+  specialty?: string;
+  therapy?: string;
+  category?: MemberCategory;
+  consultationType?: ConsultationType;
+  acceptsInsurance?: boolean;
+}
+
 export const membersApi = {
-  // Public endpoints
+  // Public endpoints (basic data)
   getAll: (category?: MemberCategory) => {
     const query = category ? `?category=${category}` : '';
     return apiFetch<Member[]>(`/members${query}`);
@@ -480,21 +672,56 @@ export const membersApi = {
 
   getSlugs: () => apiFetch<string[]>('/members/slugs'),
 
+  // Directory endpoints (full data)
+  getDirectory: (filters?: DirectoryFilters) => {
+    const query = new URLSearchParams();
+    if (filters?.city) query.set('city', filters.city);
+    if (filters?.specialty) query.set('specialty', filters.specialty);
+    if (filters?.therapy) query.set('therapy', filters.therapy);
+    if (filters?.category) query.set('category', filters.category);
+    if (filters?.consultationType) query.set('consultationType', filters.consultationType);
+    if (filters?.acceptsInsurance !== undefined) query.set('acceptsInsurance', String(filters.acceptsInsurance));
+    const queryStr = query.toString();
+    return apiFetch<DirectoryMember[]>(`/members/directory${queryStr ? `?${queryStr}` : ''}`);
+  },
+
+  getDirectoryBySlug: (slug: string) => apiFetch<DirectoryMember>(`/members/directory/${slug}`),
+
   // Admin endpoints
-  getAllAdmin: () => apiFetch<Member[]>('/members/admin', { auth: true }),
+  getAllAdmin: () => apiFetch<DirectoryMember[]>('/members/admin', { auth: true }),
 
   create: (data: CreateMemberDto) =>
-    apiFetch<Member>('/members', { method: 'POST', body: data, auth: true }),
+    apiFetch<DirectoryMember>('/members', { method: 'POST', body: data, auth: true }),
 
   update: (id: string, data: UpdateMemberDto) =>
-    apiFetch<Member>(`/members/${id}`, { method: 'PUT', body: data, auth: true }),
+    apiFetch<DirectoryMember>(`/members/${id}`, { method: 'PUT', body: data, auth: true }),
 
   delete: (id: string) =>
     apiFetch(`/members/${id}`, { method: 'DELETE', auth: true }),
 
   toggle: (id: string) =>
-    apiFetch<Member>(`/members/${id}/toggle`, { method: 'PATCH', auth: true }),
+    apiFetch<DirectoryMember>(`/members/${id}/toggle`, { method: 'PATCH', auth: true }),
+  
+  // Subscription endpoints
+  getExpiring: (days = 7) => 
+    apiFetch<{ id: string; slug: string; name: string; email: string; subscriptionPlan: SubscriptionPlan; subscriptionEnd: string }[]>(
+      `/members/subscriptions/expiring?days=${days}`, { auth: true }
+    ),
+  
+  getExpired: () => 
+    apiFetch<{ id: string; slug: string; name: string; email: string; subscriptionPlan: SubscriptionPlan; subscriptionEnd: string; isActive: boolean }[]>(
+      '/members/subscriptions/expired', { auth: true }
+    ),
+  
+  processExpired: () =>
+    apiFetch<{ processed: number; emails: number }>('/members/subscriptions/process', { method: 'POST', auth: true }),
+  
+  renew: (id: string, subscriptionType: SubscriptionType) =>
+    apiFetch<{ id: string; name: string; subscriptionPlan: SubscriptionPlan; subscriptionStart: string; subscriptionEnd: string; isActive: boolean }>(
+      `/members/${id}/renew`, { method: 'POST', body: { subscriptionType }, auth: true }
+    ),
 };
 
 // Export helpers
 export { getAccessToken, getRefreshToken, setTokens, clearTokens };
+

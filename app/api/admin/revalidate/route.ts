@@ -17,10 +17,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Optionally verify token with backend (for production)
-    // For now, just check that a token is present
-    // The user is already authenticated to access /admin routes
-
     const body = await request.json();
     const { type, slug } = body;
 
@@ -31,45 +27,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[Admin Revalidate] type=${type}, slug=${slug}`);
-
+    // Next.js 16 requires 'max' cache profile for revalidateTag
     switch (type) {
       case 'member':
-        revalidateTag('members');
-        revalidateTag('members-all');
-        revalidatePath('/equipo');
+        await revalidateTag('members', 'max');
+        await revalidateTag('members-all', 'max');
+        await revalidatePath('/equipo', 'page');
+        await revalidatePath('/directorio', 'page');
         
         if (slug) {
-          revalidateTag(`member-${slug}`);
-          revalidatePath(`/m/${slug}`);
+          await revalidateTag(`member-${slug}`, 'max');
+          await revalidatePath(`/m/${slug}`, 'page');
+          await revalidatePath(`/directorio/${slug}`, 'page');
         }
         break;
 
       case 'post':
-        revalidateTag('posts');
-        revalidatePath('/blog');
+        await revalidateTag('posts', 'max');
+        await revalidatePath('/blog', 'page');
         
         if (slug) {
-          revalidateTag(`post-${slug}`);
-          revalidatePath(`/blog/${slug}`);
+          await revalidateTag(`post-${slug}`, 'max');
+          await revalidatePath(`/blog/${slug}`, 'page');
         }
         break;
 
       case 'author':
-        revalidateTag('authors');
+        await revalidateTag('authors', 'max');
         
         if (slug) {
-          revalidateTag(`author-${slug}`);
-          revalidatePath(`/blog/autor/${slug}`);
+          await revalidateTag(`author-${slug}`, 'max');
+          await revalidatePath(`/blog/autor/${slug}`, 'page');
         }
         break;
 
       case 'tag':
-        revalidateTag('tags');
-        revalidatePath('/blog');
+        await revalidateTag('tags', 'max');
+        await revalidatePath('/blog', 'page');
         
         if (slug) {
-          revalidatePath(`/blog/categoria/${slug}`);
+          await revalidatePath(`/blog/categoria/${slug}`, 'page');
         }
         break;
 
