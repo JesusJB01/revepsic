@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authApi, getAccessToken, clearTokens } from '@/lib/api';
+import { saveAuthToken, clearAuthToken } from '@/lib/actions/auth';
 
 interface User {
     id: string;
@@ -61,6 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (userData) {
                     setUser(userData);
                 }
+
+                // IMPORTANT: Save token to cookies for Server Actions
+                const token = getAccessToken();
+                if (token) {
+                    await saveAuthToken(token);
+                }
+
                 return { success: true };
             }
 
@@ -72,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         await authApi.logout();
+        await clearAuthToken(); // Clear cookie
         setUser(null);
     };
 

@@ -2,10 +2,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { postsApi, tagsApi, authorsApi, uploadApi, Tag, Author } from "@/lib/api";
+import { postsApi, uploadApi, Tag, Author } from "@/lib/api";
+import { getTagsForForm, getAuthorsForForm } from "@/lib/actions/posts-form";
 import { ArrowLeft, Save, Loader2, ImageIcon, X, Upload } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
+import { postSchema } from "@/lib/validations";
+import { revalidatePosts } from "@/lib/actions/revalidate";
 
 // Dynamic import for MDEditor to avoid SSR issues
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
@@ -33,12 +37,16 @@ export default function NewPostPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const [tagsRes, authorsRes] = await Promise.all([
-                tagsApi.getAll(),
-                authorsApi.getAll(),
-            ]);
-            if (tagsRes.success && tagsRes.data) setTags(Array.isArray(tagsRes.data) ? tagsRes.data : []);
-            if (authorsRes.success && authorsRes.data) setAuthors(Array.isArray(authorsRes.data) ? authorsRes.data : []);
+            try {
+                const [tagsData, authorsData] = await Promise.all([
+                    getTagsForForm(),
+                    getAuthorsForForm(),
+                ]);
+                setTags(Array.isArray(tagsData) ? tagsData as any : []);
+                setAuthors(Array.isArray(authorsData) ? authorsData as any : []);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         };
         fetchData();
     }, []);
@@ -77,11 +85,11 @@ export default function NewPostPage() {
         // Validate
         const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
         if (!validTypes.includes(file.type)) {
-            alert("Formato no válido. Usa JPG, PNG, GIF o WEBP.");
+            toast.error("Formato no válido", { description: "Usa JPG, PNG, GIF o WEBP" });
             return;
         }
         if (file.size > 5 * 1024 * 1024) {
-            alert("La imagen es muy grande. Máximo 5MB.");
+            toast.error("Imagen muy grande", { description: "El tamaño máximo es 5MB" });
             return;
         }
 
@@ -103,31 +111,39 @@ export default function NewPostPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validation
-        if (!formData.title.trim()) {
-            alert("El título es requerido");
-            return;
-        }
-        if (!formData.authorId) {
-            alert("Debes seleccionar un autor");
+        // Validate with Zod
+        const postData = {
+            title: formData.title,
+            slug: formData.slug || undefined,
+            content: formData.content,
+            excerpt: formData.excerpt || undefined,
+            authorId: formData.authorId,
+            status: formData.status,
+            isPremium: formData.isPremium,
+            tagIds: formData.tagIds,
+        };
+
+        const validation = postSchema.safeParse(postData);
+
+        if (!validation.success) {
+            // Show first error as toast
+            const firstError = validation.error.issues[0];
+            toast.error("Error de validación", {
+                description: firstError.message
+            });
             return;
         }
 
         setIsLoading(true);
 
         try {
-            // Step 1: Create the post - only send fields the API expects
-            const postData = {
-                title: formData.title,
-                slug: formData.slug,
-                excerpt: formData.excerpt,
-                content: formData.content,
-                authorId: formData.authorId,
-                status: formData.status,
-                isPremium: formData.isPremium,
-                tagIds: formData.tagIds,
+            // Step 1: Create the post
+            // Cast to match API expected types
+            const createData = {
+                ...validation.data,
+                status: validation.data.status as "DRAFT" | "PUBLISHED",
             };
-            const response = await postsApi.create(postData);
+            const response = await postsApi.create(createData);
 
             if (response.success && response.data) {
                 const postId = response.data.id;
@@ -140,14 +156,16 @@ export default function NewPostPage() {
                     }
                 }
 
+                await revalidatePosts(validation.data.slug);
                 router.push("/admin/posts");
+                toast.success("Post creado correctamente");
             } else {
                 const errorMsg = response.message || response.error || "Error al crear el post";
-                alert(errorMsg);
+                toast.error("Error al crear el post", { description: errorMsg });
             }
         } catch (err) {
             console.error("Submit error:", err);
-            alert("Error de conexión. Verifica tu sesión e intenta de nuevo.");
+            toast.error("Error de conexión", { description: "Verifica tu sesión e intenta de nuevo" });
         }
 
         setIsLoading(false);

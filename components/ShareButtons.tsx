@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Facebook, Twitter, Linkedin, Link as LinkIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface ShareButtonsProps {
     title: string;
@@ -34,11 +35,13 @@ export default function ShareButtons({ title, url }: ShareButtonsProps) {
     const copyToClipboard = async () => {
         try {
             await navigator.clipboard.writeText(shareUrl);
-            alert("¡Enlace copiado!");
+            toast.success("¡Enlace copiado!");
         } catch (err) {
             console.error("Error copying:", err);
+            toast.error("Error al copiar el enlace");
         }
     };
+
 
     return (
         <div className="flex items-center gap-2">

@@ -1,62 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import React, { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import { FadeIn } from "./animations";
-import { newsletterApi } from "@/lib/api";
+import { subscribeToNewsletter, type NewsletterActionState } from "@/lib/actions/newsletter";
 import newsletterAnimation from "@/public/animations/Newslettert.json";
+import { toast } from "sonner";
+
+// Initial state for the form
+const initialState: NewsletterActionState = {
+  success: false,
+  message: "",
+};
 
 export default function Newsletter() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
+  const [state, formAction, isPending] = useActionState(subscribeToNewsletter, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validar nombre
-    if (!name.trim()) {
-      setStatus("error");
-      setMessage("Por favor, ingresa tu nombre.");
-      return;
-    }
-
-    // Validar email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setStatus("error");
-      setMessage("Por favor, ingresa un correo válido.");
-      return;
-    }
-
-    setStatus("loading");
-
-    const response = await newsletterApi.subscribe(email, name.trim(), "homepage_newsletter");
-
-    if (response.success) {
-      // Verificar si ya estaba suscrito
-      const msg = response.message?.toLowerCase() || "";
-      if (msg.includes("already subscribed") || msg.includes("ya suscrito")) {
-        setStatus("success");
-        setMessage("Este correo ya está suscrito a nuestro newsletter. ¡Gracias por tu interés!");
+  // Show toast notification when state changes
+  useEffect(() => {
+    if (state.message) {
+      if (state.success) {
+        toast.success(state.message);
+        // Reset form on success
+        formRef.current?.reset();
       } else {
-        setStatus("success");
-        setMessage("¡Revisa tu email para confirmar tu suscripción!");
+        toast.error(state.message);
       }
-      setEmail("");
-      setName("");
-    } else {
-      setStatus("error");
-      setMessage(response.message || "Error al suscribirse. Intenta de nuevo.");
     }
-
-    setTimeout(() => {
-      setStatus("idle");
-      setMessage("");
-    }, 5000);
-  };
+  }, [state]);
 
   return (
     <section className="py-20 md:py-28 bg-slate-950 relative overflow-hidden">
@@ -90,47 +63,56 @@ export default function Newsletter() {
                 Mantente informado con todo lo que necesitas saber en Psicología.
               </p>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Form - using Server Action */}
+              <form ref={formRef} action={formAction} className="space-y-4">
+                <input type="hidden" name="source" value="homepage_newsletter" />
+
                 <div className="flex flex-col gap-3">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Tu nombre"
-                    className="px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                    disabled={status === "loading"}
-                  />
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div>
                     <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="correo@ejemplo.com"
-                      className="flex-1 px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                      disabled={status === "loading"}
+                      type="text"
+                      name="name"
+                      placeholder="Tu nombre"
+                      required
+                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      disabled={isPending}
+                      aria-describedby={state.errors?.name ? "name-error" : undefined}
                     />
+                    {state.errors?.name && (
+                      <p id="name-error" className="mt-1 text-sm text-red-400">
+                        {state.errors.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="correo@ejemplo.com"
+                        required
+                        className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        disabled={isPending}
+                        aria-describedby={state.errors?.email ? "email-error" : undefined}
+                      />
+                      {state.errors?.email && (
+                        <p id="email-error" className="mt-1 text-sm text-red-400">
+                          {state.errors.email}
+                        </p>
+                      )}
+                    </div>
                     <motion.button
                       type="submit"
-                      whileHover={{ scale: status === "loading" ? 1 : 1.05 }}
-                      whileTap={{ scale: status === "loading" ? 1 : 0.95 }}
-                      disabled={status === "loading"}
+                      whileHover={{ scale: isPending ? 1 : 1.05 }}
+                      whileTap={{ scale: isPending ? 1 : 0.95 }}
+                      disabled={isPending}
                       className="px-6 py-3 gradient-bg text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      {status === "loading" ? "Enviando..." : "Suscribirse"}
+                      {isPending ? "Enviando..." : "Suscribirse"}
                     </motion.button>
                   </div>
                 </div>
-
-                {message && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`text-sm ${status === "error" ? "text-red-400" : "text-green-400"}`}
-                  >
-                    {message}
-                  </motion.p>
-                )}
               </form>
 
               <p className="text-xs text-slate-500">

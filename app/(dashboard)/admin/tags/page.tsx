@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { tagsApi, Tag } from "@/lib/api";
 import { Plus, Edit, Trash2, Hash } from "lucide-react";
 import RoleGuard from "@/components/auth/RoleGuard";
+import { fetchTagsFromDb } from "@/lib/actions/admin-data";
+import { revalidateTags } from "@/lib/actions/revalidate";
+import { toast } from "sonner";
 
 export default function TagsAdminPage() {
     const [tags, setTags] = useState<Tag[]>([]);
@@ -17,12 +20,8 @@ export default function TagsAdminPage() {
 
     const fetchTags = async () => {
         try {
-            const response = await tagsApi.getAll();
-            if (response.success && response.data) {
-                setTags(Array.isArray(response.data) ? response.data : []);
-            } else {
-                setTags([]);
-            }
+            const tags = await fetchTagsFromDb();
+            setTags(tags as Tag[]);
         } catch (error) {
             console.error("Error fetching tags:", error);
             setTags([]);
@@ -63,9 +62,12 @@ export default function TagsAdminPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm("¿Estás seguro de eliminar este tag?")) return;
+        const tagToDelete = tags.find(t => t.id === id);
         const response = await tagsApi.delete(id);
         if (response.success) {
             setTags(tags.filter((t) => t.id !== id));
+            await revalidateTags(tagToDelete?.slug);
+            toast.success("Tag eliminado correctamente");
         }
     };
 

@@ -13,7 +13,8 @@ import {
     BadgeCheck,
     DollarSign
 } from "lucide-react";
-import type { DirectoryMember, ConsultationType } from "@/lib/api";
+import type { DirectoryMember } from "@/lib/data/team";
+import type { ConsultationType } from "@/lib/api";
 
 interface DirectoryCardProps {
     member: DirectoryMember;

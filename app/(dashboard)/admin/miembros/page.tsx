@@ -4,6 +4,9 @@ import { membersApi, uploadApi, DirectoryMember, MemberCategory, CreateMemberDto
 import Image from "next/image";
 import { Plus, Edit, Trash2, UserCircle, Upload, X, Loader2, ToggleLeft, ToggleRight, Users, Award, Star, ChevronDown, ChevronUp, MapPin, BadgeCheck, Calendar } from "lucide-react";
 import RoleGuard from "@/components/auth/RoleGuard";
+import { toast } from "sonner";
+import { revalidateMembers } from "@/lib/actions/revalidate";
+import { fetchMembersFromDb } from "@/lib/actions/admin-data";
 
 const CATEGORIES: { value: MemberCategory; label: string; icon: React.ReactNode }[] = [
     { value: "FUNDADORES", label: "Fundador", icon: <Award className="h-4 w-4" /> },
@@ -182,10 +185,8 @@ export default function MembersAdminPage() {
 
     const fetchMembers = async () => {
         try {
-            const response = await membersApi.getAllAdmin();
-            if (response.success && response.data) {
-                setMembers(Array.isArray(response.data) ? response.data : []);
-            } else { setMembers([]); }
+            const members = await fetchMembersFromDb();
+            setMembers(Array.isArray(members) ? members : []);
         } catch (error) { console.error("Error fetching members:", error); setMembers([]); }
         setIsLoading(false);
     };
@@ -194,8 +195,8 @@ export default function MembersAdminPage() {
         const file = e.target.files?.[0];
         if (!file) return;
         const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-        if (!validTypes.includes(file.type)) { alert("Formato no válido. Usa JPG, PNG, GIF o WEBP."); return; }
-        if (file.size > 5 * 1024 * 1024) { alert("La imagen es muy grande. Máximo 5MB."); return; }
+        if (!validTypes.includes(file.type)) { toast.error("Formato no válido", { description: "Usa JPG, PNG, GIF o WEBP" }); return; }
+        if (file.size > 5 * 1024 * 1024) { toast.error("Imagen muy grande", { description: "El tamaño máximo es 5MB" }); return; }
         setPhotoFile(file);
         const reader = new FileReader();
         reader.onload = () => setPhotoPreview(reader.result as string);
@@ -217,9 +218,9 @@ export default function MembersAdminPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (formData.name.trim().length < 2) { alert("El nombre debe tener al menos 2 caracteres"); return; }
-        if (formData.position.trim().length < 2) { alert("El cargo debe tener al menos 2 caracteres"); return; }
-        if (formData.bio.trim().length < 10) { alert("La biografía debe tener al menos 10 caracteres"); return; }
+        if (formData.name.trim().length < 2) { toast.error("El nombre debe tener al menos 2 caracteres"); return; }
+        if (formData.position.trim().length < 2) { toast.error("El cargo debe tener al menos 2 caracteres"); return; }
+        if (formData.bio.trim().length < 10) { toast.error("La biografía debe tener al menos 10 caracteres"); return; }
 
         setIsSaving(true);
         // Clean and prepare data
@@ -231,8 +232,6 @@ export default function MembersAdminPage() {
             cleanedData.whatsapp = whatsapp;
         }
 
-        console.log("Sending data to API:", JSON.stringify(cleanedData, null, 2));
-
         try {
             if (editingMember) {
                 const response = await membersApi.update(editingMember.id, cleanedData);
@@ -240,13 +239,13 @@ export default function MembersAdminPage() {
                     if (photoFile) { setIsUploading(true); await uploadApi.uploadMemberPhoto(editingMember.id, photoFile); setIsUploading(false); }
                     await revalidateMembers(editingMember.slug);
                     fetchMembers(); closeModal();
+                    toast.success("Miembro actualizado correctamente");
                 } else {
                     const msg = (response as any).message;
                     const errorMsg = typeof msg === 'string'
                         ? msg
                         : (Array.isArray(msg) ? msg.join(', ') : JSON.stringify(msg || response.error || response));
-                    console.error("API Error FULL:", JSON.stringify(response, null, 2));
-                    alert(`Error al actualizar miembro:\n${errorMsg}`);
+                    toast.error("Error al actualizar miembro", { description: errorMsg });
                 }
             } else {
                 const response = await membersApi.create(cleanedData as CreateMemberDto);
@@ -254,19 +253,19 @@ export default function MembersAdminPage() {
                     if (photoFile) { setIsUploading(true); await uploadApi.uploadMemberPhoto(response.data.id, photoFile); setIsUploading(false); }
                     await revalidateMembers();
                     fetchMembers(); closeModal();
+                    toast.success("Miembro creado correctamente");
                 } else {
                     const msg = (response as any).message;
                     const errorMsg = typeof msg === 'string'
                         ? msg
                         : (Array.isArray(msg) ? msg.join(', ') : JSON.stringify(msg || response.error || response));
-                    console.error("API Error FULL:", JSON.stringify(response, null, 2));
-                    alert(`Error al crear miembro:\n${errorMsg}`);
+                    toast.error("Error al crear miembro", { description: errorMsg });
                 }
             }
         } catch (error: unknown) {
             console.error("Error saving member:", error);
             const errorMessage = error instanceof Error ? error.message : "Error desconocido al guardar";
-            alert(`Error al guardar miembro:\n${errorMessage}`);
+            toast.error("Error al guardar miembro", { description: errorMessage });
         }
         setIsSaving(false);
     };
@@ -275,17 +274,17 @@ export default function MembersAdminPage() {
         if (!confirm("¿Estás seguro de eliminar este miembro?")) return;
         try {
             const response = await membersApi.delete(id);
-            if (response.success) { await revalidateMembers(); fetchMembers(); }
-            else { alert(response.message || "Error al eliminar miembro"); }
-        } catch (error) { console.error("Error deleting member:", error); alert("Error al eliminar miembro"); }
+            if (response.success) { await revalidateMembers(); fetchMembers(); toast.success("Miembro eliminado"); }
+            else { toast.error(response.message || "Error al eliminar miembro"); }
+        } catch (error) { console.error("Error deleting member:", error); toast.error("Error al eliminar miembro"); }
     };
 
     const handleToggle = async (id: string) => {
         try {
             const response = await membersApi.toggle(id);
-            if (response.success) { await revalidateMembers(); fetchMembers(); }
-            else { alert(response.message || "Error al cambiar estado"); }
-        } catch (error) { console.error("Error toggling member:", error); alert("Error al cambiar estado del miembro"); }
+            if (response.success) { await revalidateMembers(); fetchMembers(); toast.success("Estado actualizado"); }
+            else { toast.error(response.message || "Error al cambiar estado"); }
+        } catch (error) { console.error("Error toggling member:", error); toast.error("Error al cambiar estado del miembro"); }
     };
 
     const openEditModal = (member: DirectoryMember) => {

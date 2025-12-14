@@ -6,30 +6,33 @@ export function estimateReadTime(content: string): number {
   return Math.ceil(words / 200);
 }
 
-// Types compartidos
+// Types compartidos - Compatible con Prisma
 export interface Post {
   id: string;
   title: string;
   slug: string;
   content: string;
-  excerpt: string;
-  coverImage?: string;
-  status: 'DRAFT' | 'PUBLISHED';
+  excerpt: string | null;
+  coverImage: string | null;
+  status: string;
   isPremium: boolean;
   viewCount: number;
-  publishedAt?: string;
+  readTime: number | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  publishedAt: string | null;
   createdAt: string;
-  author: { id: string; name: string; slug: string; avatar?: string };
-  tags: { id: string; name: string; slug: string }[];
-  metaTitle?: string;
-  metaDescription?: string;
+  updatedAt: string;
+  author: Author | null;
+  tags: Tag[];
 }
 
 export interface Tag {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description?: string | null;
+  color?: string | null;
   postCount?: number;
 }
 
@@ -37,9 +40,14 @@ export interface Author {
   id: string;
   name: string;
   slug: string;
-  bio?: string;
-  avatar?: string;
-  email?: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
+  email?: string | null;
+  specialty?: string | null;
+  profession?: string | null;
+  website?: string | null;
+  twitter?: string | null;
+  linkedin?: string | null;
 }
 
 export interface Pagination {

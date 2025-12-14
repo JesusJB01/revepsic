@@ -1,6 +1,7 @@
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth/AuthProvider"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata = {
   title: 'REVEPSIC - Red Venezolana Para el Avance de la Psicología Científica',
@@ -38,12 +39,14 @@ export default function RootLayout({
             disableTransitionOnChange={false}
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </AuthProvider>
       </body>
     </html>
   )
 }
+
 
 
 

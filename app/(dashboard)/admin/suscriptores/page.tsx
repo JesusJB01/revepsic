@@ -5,6 +5,7 @@ import { Users, TrendingUp, TrendingDown, Mail, Clock, ChevronLeft, ChevronRight
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import RoleGuard from "@/components/auth/RoleGuard";
+import { fetchSubscribersFromDb, fetchSubscriberStatsFromDb } from "@/lib/actions/admin-data";
 
 type StatusFilter = '' | 'PENDING' | 'ACTIVE' | 'UNSUBSCRIBED' | 'BOUNCED';
 type TierFilter = '' | 'FREE' | 'PREMIUM';
@@ -26,46 +27,41 @@ export default function SubscribersAdminPage() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const fetchStats = async () => {
-        const response = await newsletterApi.getStats();
-        if (response.success && response.data) {
-            setStats(response.data);
+        try {
+            const stats = await fetchSubscriberStatsFromDb();
+            if (stats) {
+                // Convert to expected format
+                setStats({
+                    total: stats.total || 0,
+                    byStatus: {
+                        ACTIVE: stats.active || 0,
+                        PENDING: stats.pending || 0,
+                        UNSUBSCRIBED: stats.unsubscribed || 0,
+                        BOUNCED: 0,
+                    },
+                    byTier: { FREE: 0, PREMIUM: 0 },
+                    last30Days: 0,
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching stats:", error);
         }
     };
 
     const fetchSubscribers = useCallback(async () => {
         setIsLoadingTable(true);
-        const response = await newsletterApi.getSubscribers({
-            page,
-            limit: 10,
-            status: statusFilter || undefined,
-            tier: tierFilter || undefined,
-        });
-
-        if (response.success && response.data) {
-            // Manejar ambas estructuras posibles de respuesta
-            const responseData = response.data as any;
-
-            // Si la respuesta tiene data.data (estructura anidada)
-            if (responseData.data && Array.isArray(responseData.data)) {
-                setSubscribers(responseData.data);
-                setTotalPages(responseData.pagination?.totalPages || 1);
-                setTotal(responseData.pagination?.total || responseData.data.length);
+        try {
+            const subs = await fetchSubscribersFromDb();
+            if (subs) {
+                setSubscribers(subs as Subscriber[]);
+                setTotal(subs.length);
+                setTotalPages(1); // No pagination with Prisma for now
             }
-            // Si la respuesta es un array directamente
-            else if (Array.isArray(responseData)) {
-                setSubscribers(responseData);
-                setTotalPages(1);
-                setTotal(responseData.length);
-            }
-            // Si tiene estructura con subscribers directamente
-            else if (responseData.subscribers && Array.isArray(responseData.subscribers)) {
-                setSubscribers(responseData.subscribers);
-                setTotalPages(responseData.pagination?.totalPages || 1);
-                setTotal(responseData.pagination?.total || responseData.subscribers.length);
-            }
+        } catch (error) {
+            console.error("Error fetching subscribers:", error);
         }
         setIsLoadingTable(false);
-    }, [page, statusFilter, tierFilter]);
+    }, []);
 
     useEffect(() => {
         const init = async () => {

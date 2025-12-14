@@ -27,8 +27,8 @@ import {
     Play,
     User
 } from "lucide-react";
-import { getDirectoryMemberBySlug } from "@/lib/data/team";
-import type { ConsultationType, MemberLocation, Education, Schedule, MemberComment } from "@/lib/api";
+import { getDirectoryMemberBySlug, type MemberLocation, type Education, type Schedule, type MemberComment } from "@/lib/data/team";
+import type { ConsultationType } from "@/lib/api";
 
 interface DirectoryProfilePageProps {
     params: Promise<{ slug: string }>;
@@ -56,10 +56,22 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
         notFound();
     }
 
+    // Extract arrays safely for type-safe access
+    const specialties = member.specialties ?? [];
+    const therapies = member.therapies ?? [];
+    const targetAges = member.targetAges ?? [];
+    const education = member.education ?? [];
+    const locations = member.locations ?? [];
+    const consultationTypes = member.consultationTypes ?? [];
+    const insuranceProviders = member.insuranceProviders ?? [];
+    const languages = member.languages ?? [];
+    const comments = member.comments ?? [];
+
     // Calculate average rating
-    const avgRating = member.comments && member.comments.length > 0
-        ? Math.round((member.comments.reduce((acc, c) => acc + c.rating, 0) / member.comments.length) * 10) / 10
+    const avgRating = comments.length > 0
+        ? Math.round((comments.reduce((acc, c) => acc + c.rating, 0) / comments.length) * 10) / 10
         : null;
+
 
     return (
         <div className="min-h-screen bg-background">
@@ -203,15 +215,15 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                         )}
 
                         {/* Specialties & Therapies */}
-                        {(member.specialties?.length > 0 || member.therapies?.length > 0) && (
+                        {(specialties.length > 0 || therapies.length > 0) && (
                             <section className="bg-card rounded-2xl border border-border p-6">
                                 <h2 className="text-xl font-bold text-foreground mb-4">Especialidades y Terapias</h2>
 
-                                {member.specialties?.length > 0 && (
+                                {specialties.length > 0 && (
                                     <div className="mb-4">
                                         <h3 className="text-sm font-medium text-muted-foreground mb-2">Especialidades</h3>
                                         <div className="flex flex-wrap gap-2">
-                                            {member.specialties.map((s, i) => (
+                                            {specialties.map((s, i) => (
                                                 <span key={i} className="px-3 py-1 text-sm bg-pink-500/10 text-pink-500 rounded-full">
                                                     {s}
                                                 </span>
@@ -220,11 +232,11 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                                     </div>
                                 )}
 
-                                {member.therapies?.length > 0 && (
+                                {therapies.length > 0 && (
                                     <div className="mb-4">
                                         <h3 className="text-sm font-medium text-muted-foreground mb-2">Tipos de terapia</h3>
                                         <div className="flex flex-wrap gap-2">
-                                            {member.therapies.map((t, i) => (
+                                            {therapies.map((t, i) => (
                                                 <span key={i} className="px-3 py-1 text-sm bg-amber-500/10 text-amber-500 rounded-full">
                                                     {t}
                                                 </span>
@@ -233,11 +245,11 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                                     </div>
                                 )}
 
-                                {member.targetAges?.length > 0 && (
+                                {targetAges.length > 0 && (
                                     <div>
                                         <h3 className="text-sm font-medium text-muted-foreground mb-2">Poblaciones atendidas</h3>
                                         <div className="flex flex-wrap gap-2">
-                                            {member.targetAges.map((a, i) => (
+                                            {targetAges.map((a, i) => (
                                                 <span key={i} className="px-3 py-1 text-sm bg-violet-500/10 text-violet-500 rounded-full">
                                                     {a}
                                                 </span>
@@ -249,14 +261,14 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                         )}
 
                         {/* Education */}
-                        {member.education?.length > 0 && (
+                        {education.length > 0 && (
                             <section className="bg-card rounded-2xl border border-border p-6">
                                 <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                                     <GraduationCap className="w-5 h-5" />
                                     Formación académica
                                 </h2>
                                 <div className="space-y-4">
-                                    {member.education.map((edu, i) => (
+                                    {education.map((edu, i) => (
                                         <div key={i} className="flex gap-4">
                                             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                                                 <GraduationCap className="w-5 h-5 text-muted-foreground" />
@@ -278,14 +290,14 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                         )}
 
                         {/* Locations */}
-                        {member.locations?.length > 0 && (
+                        {locations.length > 0 && (
                             <section className="bg-card rounded-2xl border border-border p-6">
                                 <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                                     <MapPin className="w-5 h-5" />
                                     Ubicaciones
                                 </h2>
                                 <div className="space-y-4">
-                                    {member.locations.map((loc, i) => (
+                                    {locations.map((loc, i) => (
                                         <LocationCard key={i} location={loc} />
                                     ))}
                                 </div>
@@ -293,14 +305,14 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                         )}
 
                         {/* Reviews */}
-                        {member.comments && member.comments.length > 0 && (
+                        {comments.length > 0 && (
                             <section className="bg-card rounded-2xl border border-border p-6">
                                 <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                                     <Star className="w-5 h-5" />
-                                    Opiniones ({member.comments.length})
+                                    Opiniones ({comments.length})
                                 </h2>
                                 <div className="space-y-4">
-                                    {member.comments.map((comment) => (
+                                    {comments.map((comment) => (
                                         <CommentCard key={comment.id} comment={comment} />
                                     ))}
                                 </div>
@@ -332,11 +344,11 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                             )}
 
                             {/* Consultation types */}
-                            {member.consultationTypes?.length > 0 && (
+                            {consultationTypes.length > 0 && (
                                 <div className="mb-6 pb-6 border-b border-border">
                                     <h3 className="text-sm font-medium text-muted-foreground mb-3">Modalidad de atención</h3>
                                     <div className="space-y-2">
-                                        {member.consultationTypes.map((type, i) => (
+                                        {consultationTypes.map((type, i) => (
                                             <div key={i} className="flex items-center gap-2 text-foreground">
                                                 <ConsultationTypeIcon type={type} />
                                                 <span>{type === "PRESENCIAL" ? "Presencial" : type === "ONLINE" ? "Online" : "A domicilio"}</span>
@@ -354,9 +366,9 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                                         <Shield className="w-4 h-4" />
                                         <span>Acepta seguros médicos</span>
                                     </div>
-                                    {member.insuranceProviders?.length > 0 && (
+                                    {insuranceProviders.length > 0 && (
                                         <div className="flex flex-wrap gap-1">
-                                            {member.insuranceProviders.map((ins, i) => (
+                                            {insuranceProviders.map((ins, i) => (
                                                 <span key={i} className="px-2 py-0.5 text-xs bg-muted rounded-full text-muted-foreground">
                                                     {ins}
                                                 </span>
@@ -367,14 +379,13 @@ export default async function DirectoryProfilePage({ params }: DirectoryProfileP
                             )}
 
                             {/* Languages */}
-                            {member.languages?.length > 0 && (
+                            {languages.length > 0 && (
                                 <div className="mb-6 pb-6 border-b border-border">
                                     <h3 className="text-sm font-medium text-muted-foreground mb-2">Idiomas</h3>
-                                    <p className="text-foreground">{member.languages.join(", ")}</p>
+                                    <p className="text-foreground">{languages.join(", ")}</p>
                                 </div>
                             )}
 
-                            {/* Schedule */}
                             {/* Schedule */}
                             {member.schedule && member.schedule.slots && Object.keys(member.schedule.slots).length > 0 && (
                                 <div className="mb-6 pb-6 border-b border-border">

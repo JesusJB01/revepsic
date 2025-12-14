@@ -14,26 +14,24 @@ interface BlogEntry {
 }
 
 export async function getData() {
-  const api = process.env.URL_VERCEL || "http://localhost:3000";
-
-  if (!api) {
-    return null;
-  }
+  // Get the site URL from environment or use localhost for development
+  // In Vercel, you can set NEXT_PUBLIC_SITE_URL or use VERCEL_URL
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
   try {
-    const response = await fetch(`${api}/api/blog`, { cache: "no-store" });
+    const response = await fetch(`${baseUrl}/api/blog`, { cache: "no-store" });
 
     if (!response.ok) {
       return null;
-      throw new Error("Error al obtener datos de la API");
     }
 
     const data = await response.json();
 
     return data;
   } catch (error) {
-    console.error("Error al obtener datossssssssssss:", error);
-    throw error; // Propaga el error para que pueda ser manejado más arriba si es necesario.
+    console.error("Error al obtener datos:", error);
+    throw error;
   }
 }
 
@@ -106,7 +104,7 @@ export default async function ArticlesHome() {
           ))} */}
 
           {/* <OneCard/> */}
-            
+
         </section>
       </div>
     </div>

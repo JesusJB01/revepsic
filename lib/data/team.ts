@@ -1,18 +1,86 @@
-// Team Members Data - Server-side API functions
-// These functions fetch data from the backend API for use in Server Components
+/**
+ * Team Members Data - Prisma Direct Access
+ * 
+ * These functions query the database directly using Prisma for Server Components.
+ * Uses unstable_cache for optimized caching with on-demand revalidation.
+ */
 
-import type { Member, MemberCategory, DirectoryMember, DirectoryFilters } from "@/lib/api";
+import { unstable_cache } from "next/cache";
+import { prisma } from "@/lib/db";
+import type { Member as PrismaMember, MemberCategory as PrismaMemberCategory, Comment } from "@/app/generated/prisma";
 
-// Use API_URL (server-only) first, then fall back to NEXT_PUBLIC_API_URL
-// This ensures server-side fetches use the correct backend URL
-const API_BASE_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
-const isDev = process.env.NODE_ENV === "development";
+// Re-export types for convenience
+export type MemberCategory = PrismaMemberCategory;
 
-// Re-export types from api.ts for convenience
-export type { Member, MemberCategory, DirectoryMember, DirectoryFilters };
+// Type for directory filters
+export interface DirectoryFilters {
+  city?: string;
+  specialty?: string;
+  therapy?: string;
+  category?: MemberCategory;
+  consultationType?: string;
+  acceptsInsurance?: boolean;
+}
+
+// Helper types for JSON fields
+export interface Education {
+  degree: string;
+  field: string;
+  institution: string;
+  country?: string;
+  year?: number;
+}
+
+export interface ServiceItem {
+  name: string;
+  price: number;
+  currency?: string;
+  duration?: string;
+}
+
+export interface MemberLocation {
+  name: string;
+  type: "PRESENCIAL" | "ONLINE" | "DOMICILIO";
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  phone?: string;
+  services?: ServiceItem[];
+}
+
+export interface PriceRange {
+  min: number;
+  max: number;
+  currency?: string;
+  notes?: string;
+}
+
+export interface ScheduleSlot {
+  start: string;
+  end: string;
+}
+
+export interface Schedule {
+  timezone?: string;
+  notes?: string;
+  slots?: Record<string, ScheduleSlot[]>;
+}
+
+export interface MemberComment {
+  id: string;
+  memberId: string;
+  authorName: string;
+  authorEmail: string;
+  rating: number;
+  content: string;
+  isApproved: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 // Legacy type alias for backwards compatibility with existing components
-export type TeamMember = Member & {
+export type TeamMember = PrismaMember & {
   department?: MemberCategory; // Legacy alias for category
   social?: {
     facebook?: string | null;
@@ -21,8 +89,26 @@ export type TeamMember = Member & {
   };
 };
 
-// Transform API Member to TeamMember format for existing components
-function toTeamMember(member: Member): TeamMember {
+// DirectoryMember with properly typed JSON fields
+export interface DirectoryMember extends Omit<PrismaMember, 'specialties' | 'therapies' | 'disorders' | 'languages' | 'targetAges' | 'certifications' | 'education' | 'consultationTypes' | 'insuranceProviders' | 'priceRange' | 'schedule' | 'locations'> {
+  specialties?: string[] | null;
+  therapies?: string[] | null;
+  disorders?: string[] | null;
+  languages?: string[] | null;
+  targetAges?: string[] | null;
+  certifications?: string[] | null;
+  education?: Education[] | null;
+  consultationTypes?: ("PRESENCIAL" | "ONLINE" | "DOMICILIO")[] | null;
+  insuranceProviders?: string[] | null;
+  priceRange?: PriceRange | null;
+  schedule?: Schedule | null;
+  locations?: MemberLocation[] | null;
+  comments?: MemberComment[];
+}
+
+
+// Transform Prisma Member to TeamMember format for existing components
+function toTeamMember(member: PrismaMember): TeamMember {
   return {
     ...member,
     department: member.category, // Legacy alias
@@ -34,106 +120,109 @@ function toTeamMember(member: Member): TeamMember {
   };
 }
 
-// =============================================================================
-// FETCH OPTIONS
-// Development: no-store (always fresh data, no cache)
-// Production: cache with tags for on-demand revalidation (1 day default)
-// =============================================================================
-function getFetchOptions(tags: string[]): RequestInit & { next?: { tags?: string[]; revalidate?: number } } {
-  if (isDev) {
-    // In development, always fetch fresh data
-    return { cache: "no-store" };
-  }
-  // In production, use cache with tags for on-demand revalidation
+// Transform Prisma Member to DirectoryMember with properly typed JSON fields
+function toDirectoryMember(member: PrismaMember & { comments?: Comment[] }): DirectoryMember {
   return {
-    next: {
-      tags,
-      revalidate: 86400, // 1 day fallback if on-demand revalidation fails
-    },
+    ...member,
+    specialties: member.specialties as string[] | null,
+    therapies: member.therapies as string[] | null,
+    disorders: member.disorders as string[] | null,
+    languages: member.languages as string[] | null,
+    targetAges: member.targetAges as string[] | null,
+    certifications: member.certifications as string[] | null,
+    education: member.education as Education[] | null,
+    consultationTypes: member.consultationTypes as ("PRESENCIAL" | "ONLINE" | "DOMICILIO")[] | null,
+    insuranceProviders: member.insuranceProviders as string[] | null,
+    priceRange: member.priceRange as PriceRange | null,
+    schedule: member.schedule as Schedule | null,
+    locations: member.locations as MemberLocation[] | null,
+    comments: member.comments as MemberComment[] | undefined,
   };
 }
 
 // =============================================================================
-// SERVER-SIDE DATA FETCHING FUNCTIONS
+// CACHED DATA FETCHING FUNCTIONS (using unstable_cache)
 // =============================================================================
 
 /**
- * Get all active members
- * @param category Optional filter by category
+ * Get all active members with optional category filter
+ * Cached for 1 hour with on-demand revalidation via tags
  */
-export async function getAllMembers(category?: MemberCategory): Promise<TeamMember[]> {
-  try {
-    const query = category ? `?category=${category}` : "";
-    const res = await fetch(
-      `${API_BASE_URL}/members${query}`,
-      getFetchOptions(["members", category ? `members-${category}` : "members-all"])
-    );
+export const getAllMembers = unstable_cache(
+  async (category?: MemberCategory): Promise<TeamMember[]> => {
+    try {
+      const members = await prisma.member.findMany({
+        where: {
+          isActive: true,
+          ...(category && { category }),
+        },
+        orderBy: { createdAt: "desc" },
+      });
 
-    if (!res.ok) {
-      console.error("Failed to fetch members:", res.status);
+      return members.map(toTeamMember);
+    } catch (error) {
+      console.error("Error fetching members:", error);
       return [];
     }
-
-    const data = await res.json();
-    if (data.success && Array.isArray(data.data)) {
-      return data.data.map(toTeamMember);
-    }
-    return [];
-  } catch (error) {
-    console.error("Error fetching members:", error);
-    return [];
+  },
+  ["members"],
+  {
+    tags: ["members"],
+    revalidate: 3600, // 1 hour
   }
-}
+);
 
 /**
  * Get member by slug
+ * Cached per member with on-demand revalidation
  */
 export async function getMemberBySlug(slug: string): Promise<TeamMember | null> {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/members/${slug}`,
-      getFetchOptions(["members", `member-${slug}`])
-    );
+  const getCachedMember = unstable_cache(
+    async () => {
+      try {
+        const member = await prisma.member.findUnique({
+          where: { slug, isActive: true },
+        });
 
-    if (!res.ok) {
-      return null;
+        return member ? toTeamMember(member) : null;
+      } catch (error) {
+        console.error("Error fetching member:", error);
+        return null;
+      }
+    },
+    [`member-${slug}`],
+    {
+      tags: ["members", `member-${slug}`],
+      revalidate: 3600,
     }
+  );
 
-    const data = await res.json();
-    if (data.success && data.data) {
-      return toTeamMember(data.data);
-    }
-    return null;
-  } catch (error) {
-    console.error("Error fetching member:", error);
-    return null;
-  }
+  return getCachedMember();
 }
 
 /**
  * Get all member slugs (for static generation)
  */
-export async function getAllMemberSlugs(): Promise<string[]> {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/members/slugs`,
-      getFetchOptions(["members", "members-slugs"])
-    );
+export const getAllMemberSlugs = unstable_cache(
+  async (): Promise<string[]> => {
+    try {
+      const members = await prisma.member.findMany({
+        where: { isActive: true },
+        select: { slug: true },
+      });
 
-    if (!res.ok) {
+      return members.map((m) => m.slug);
+    } catch (error) {
+      console.error("Error fetching slugs:", error);
       return [];
     }
-
-    const data = await res.json();
-    if (data.success && Array.isArray(data.data)) {
-      return data.data;
-    }
-    return [];
-  } catch (error) {
-    console.error("Error fetching slugs:", error);
-    return [];
+  },
+  ["members-slugs"],
+  {
+    tags: ["members"],
+    revalidate: 3600,
   }
-}
+);
 
 // Convenience functions by category
 export function getFundadores() {
@@ -153,14 +242,16 @@ export const getDirectiva = getFundadores;
 export const getTecnico = getTitulares;
 export const getMiembros = getAsociados;
 
-// Helper to get members grouped by category
+/**
+ * Helper to get members grouped by category
+ */
 export async function getMembersGrouped(): Promise<{
   fundadores: TeamMember[];
   titulares: TeamMember[];
   asociados: TeamMember[];
 }> {
   const allMembers = await getAllMembers();
-  
+
   return {
     fundadores: allMembers.filter((m) => m.category === "FUNDADORES"),
     titulares: allMembers.filter((m) => m.category === "TITULARES"),
@@ -177,59 +268,97 @@ export async function getMembersGrouped(): Promise<{
  * Get all members from the directory (full data) with optional filters
  */
 export async function getDirectoryMembers(filters?: DirectoryFilters): Promise<DirectoryMember[]> {
-  try {
-    const query = new URLSearchParams();
-    if (filters?.city) query.set('city', filters.city);
-    if (filters?.specialty) query.set('specialty', filters.specialty);
-    if (filters?.therapy) query.set('therapy', filters.therapy);
-    if (filters?.category) query.set('category', filters.category);
-    if (filters?.consultationType) query.set('consultationType', filters.consultationType);
-    if (filters?.acceptsInsurance !== undefined) query.set('acceptsInsurance', String(filters.acceptsInsurance));
-    
-    const queryStr = query.toString();
-    const res = await fetch(
-      `${API_BASE_URL}/members/directory${queryStr ? `?${queryStr}` : ''}`,
-      getFetchOptions(["directory", "directory-list"])
-    );
+  const getCachedDirectory = unstable_cache(
+    async () => {
+      try {
+        // Build where clause from filters
+        const where: Record<string, unknown> = { isActive: true };
+        
+        if (filters?.category) where.category = filters.category;
+        if (filters?.city) where.city = { contains: filters.city, mode: "insensitive" };
+        if (filters?.acceptsInsurance !== undefined) where.acceptsInsurance = filters.acceptsInsurance;
 
-    if (!res.ok) {
-      console.error("Failed to fetch directory:", res.status);
-      return [];
-    }
+        const members = await prisma.member.findMany({
+          where,
+          orderBy: [
+            { isVerified: "desc" },
+            { createdAt: "desc" },
+          ],
+        });
 
-    const data = await res.json();
-    if (data.success && Array.isArray(data.data)) {
-      return data.data;
+        // Filter by specialty, therapy, consultationType (JSON fields)
+        let filtered = members;
+
+        if (filters?.specialty) {
+          filtered = filtered.filter((m) => {
+            const specs = m.specialties as string[] | null;
+            return specs?.some((s) => 
+              s.toLowerCase().includes(filters.specialty!.toLowerCase())
+            );
+          });
+        }
+
+        if (filters?.therapy) {
+          filtered = filtered.filter((m) => {
+            const therapies = m.therapies as string[] | null;
+            return therapies?.some((t) => 
+              t.toLowerCase().includes(filters.therapy!.toLowerCase())
+            );
+          });
+        }
+
+        if (filters?.consultationType) {
+          filtered = filtered.filter((m) => {
+            const types = m.consultationTypes as string[] | null;
+            return types?.includes(filters.consultationType!);
+          });
+        }
+
+        return filtered.map(toDirectoryMember);
+      } catch (error) {
+        console.error("Error fetching directory:", error);
+        return [];
+      }
+    },
+    ["directory", JSON.stringify(filters || {})],
+    {
+      tags: ["directory", "members"],
+      revalidate: 3600,
     }
-    return [];
-  } catch (error) {
-    console.error("Error fetching directory:", error);
-    return [];
-  }
+  );
+
+  return getCachedDirectory();
 }
 
 /**
  * Get a single member from directory by slug (full data with comments)
  */
 export async function getDirectoryMemberBySlug(slug: string): Promise<DirectoryMember | null> {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/members/directory/${slug}`,
-      getFetchOptions(["directory", `directory-${slug}`])
-    );
+  const getCachedDirectoryMember = unstable_cache(
+    async () => {
+      try {
+        const member = await prisma.member.findUnique({
+          where: { slug, isActive: true },
+          include: {
+            comments: {
+              where: { isApproved: true },
+              orderBy: { createdAt: "desc" },
+            },
+          },
+        });
 
-    if (!res.ok) {
-      return null;
+        return member ? toDirectoryMember(member) : null;
+      } catch (error) {
+        console.error("Error fetching directory member:", error);
+        return null;
+      }
+    },
+    [`directory-${slug}`],
+    {
+      tags: ["directory", `directory-${slug}`, "members"],
+      revalidate: 3600,
     }
+  );
 
-    const data = await res.json();
-    if (data.success && data.data) {
-      return data.data;
-    }
-    return null;
-  } catch (error) {
-    console.error("Error fetching directory member:", error);
-    return null;
-  }
+  return getCachedDirectoryMember();
 }
-

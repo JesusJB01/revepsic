@@ -27,16 +27,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     authors: post.author ? [{ name: post.author.name }] : undefined,
     openGraph: {
       title: post.title,
-      description: post.excerpt || post.metaDescription,
+      description: post.excerpt || post.metaDescription || undefined,
       images: post.coverImage ? [post.coverImage] : [],
       type: 'article',
-      publishedTime: post.publishedAt,
+      publishedTime: post.publishedAt || undefined,
       authors: post.author ? [post.author.name] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description: post.excerpt || post.metaDescription,
+      description: post.excerpt || post.metaDescription || undefined,
       images: post.coverImage ? [post.coverImage] : undefined,
     },
   };

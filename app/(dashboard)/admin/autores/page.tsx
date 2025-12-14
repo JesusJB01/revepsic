@@ -4,6 +4,9 @@ import { authorsApi, uploadApi, Author } from "@/lib/api";
 import Image from "next/image";
 import { Plus, Edit, Trash2, UserCircle, Upload, X, Loader2 } from "lucide-react";
 import RoleGuard from "@/components/auth/RoleGuard";
+import { toast } from "sonner";
+import { revalidateAuthors } from "@/lib/actions/revalidate";
+import { fetchAuthorsFromDb } from "@/lib/actions/authors";
 
 export default function AuthorsAdminPage() {
     const [authors, setAuthors] = useState<Author[]>([]);
@@ -23,12 +26,8 @@ export default function AuthorsAdminPage() {
 
     const fetchAuthors = async () => {
         try {
-            const response = await authorsApi.getAll();
-            if (response.success && response.data) {
-                setAuthors(Array.isArray(response.data) ? response.data : []);
-            } else {
-                setAuthors([]);
-            }
+            const authors = await fetchAuthorsFromDb();
+            setAuthors(authors as Author[]);
         } catch (error) {
             console.error("Error fetching authors:", error);
             setAuthors([]);
@@ -56,11 +55,11 @@ export default function AuthorsAdminPage() {
         // Validate
         const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
         if (!validTypes.includes(file.type)) {
-            alert("Formato no válido. Usa JPG, PNG, GIF o WEBP.");
+            toast.error("Formato no válido", { description: "Usa JPG, PNG, GIF o WEBP" });
             return;
         }
         if (file.size > 5 * 1024 * 1024) {
-            alert("La imagen es muy grande. Máximo 5MB.");
+            toast.error("Imagen muy grande", { description: "El tamaño máximo es 5MB" });
             return;
         }
 
@@ -106,8 +105,10 @@ export default function AuthorsAdminPage() {
                     }
                     fetchAuthors();
                     closeModal();
+                    await revalidateAuthors(formData.slug);
+                    toast.success("Autor actualizado correctamente");
                 } else {
-                    alert(response.message || response.error || "Error al actualizar autor");
+                    toast.error("Error al actualizar autor", { description: response.message || response.error });
                 }
             } else {
                 // Create new author
@@ -124,13 +125,15 @@ export default function AuthorsAdminPage() {
                     }
                     fetchAuthors();
                     closeModal();
+                    await revalidateAuthors(formData.slug);
+                    toast.success("Autor creado correctamente");
                 } else {
-                    alert(response.message || response.error || "Error al crear autor");
+                    toast.error("Error al crear autor", { description: response.message || response.error });
                 }
             }
         } catch (error) {
             console.error("Error saving author:", error);
-            alert("Error al guardar autor");
+            toast.error("Error al guardar autor");
         }
 
         setIsSaving(false);
@@ -138,9 +141,12 @@ export default function AuthorsAdminPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm("¿Estás seguro de eliminar este autor?")) return;
+        const authorToDelete = authors.find(a => a.id === id);
         const response = await authorsApi.delete(id);
         if (response.success) {
             setAuthors(authors.filter((a) => a.id !== id));
+            await revalidateAuthors(authorToDelete?.slug);
+            toast.success("Autor eliminado correctamente");
         }
     };
 

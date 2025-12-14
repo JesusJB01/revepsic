@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { dashboardApi, DashboardOverview, postsApi, Post } from "@/lib/api";
+import { DashboardOverview, Post } from "@/lib/api";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { FileText, Users, Eye, TrendingUp, Clock, Edit } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { fetchDashboardOverviewFromDb, fetchRecentPostsFromDb } from "@/lib/actions/admin-data";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -19,21 +20,36 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       if (isAdmin) {
-        // Admin ve estadísticas completas
-        const response = await dashboardApi.getOverview();
-        if (response.success && response.data) {
-          setData(response.data);
+        // Admin ve estadísticas completas (desde Prisma)
+        const overview = await fetchDashboardOverviewFromDb();
+        if (overview) {
+          // Adaptar al formato esperado por el componente
+          setData({
+            posts: {
+              total: overview.posts.total,
+              published: overview.posts.published,
+              drafts: overview.posts.draft,
+            },
+            subscribers: {
+              total: overview.subscribers.total,
+              premium: 0, // No disponible desde Prisma actualmente
+              free: overview.subscribers.total, // Todo como free por ahora
+            },
+            authors: overview.authors.total, // Agregar authors
+            totalViews: overview.views.total,
+            recentPosts: [],
+          });
+          // Cargar posts recientes
+          const recentPosts = await fetchRecentPostsFromDb(5);
+          setData(prev => prev ? { ...prev, recentPosts: recentPosts as any } : null);
         } else {
           setError("Error al cargar datos");
         }
       } else {
         // Editor solo ve sus posts recientes
         try {
-          const response = await postsApi.getAll({ limit: 10 });
-          if (response.success && response.data) {
-            const postsData = response.data.data || response.data;
-            setEditorPosts(Array.isArray(postsData) ? postsData : []);
-          }
+          const recentPosts = await fetchRecentPostsFromDb(10);
+          setEditorPosts(recentPosts as Post[]);
         } catch {
           setError("Error al cargar posts");
         }

@@ -2,10 +2,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { postsApi, tagsApi, authorsApi, uploadApi, Tag, Author, Post } from "@/lib/api";
+import { postsApi, uploadApi, Tag, Author, Post } from "@/lib/api";
+import { getTagsForForm, getAuthorsForForm } from "@/lib/actions/posts-form";
 import { ArrowLeft, Save, Eye, Loader2, ImageIcon, X, Upload } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
+import { postSchema } from "@/lib/validations";
+import { revalidatePosts } from "@/lib/actions/revalidate";
 
 // Dynamic import for MDEditor to avoid SSR issues
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
@@ -42,18 +46,14 @@ export default function EditPostPage() {
             setError("");
 
             try {
-                const [tagsRes, authorsRes, postRes] = await Promise.all([
-                    tagsApi.getAll(),
-                    authorsApi.getAll(),
+                const [tagsData, authorsData, postRes] = await Promise.all([
+                    getTagsForForm(),
+                    getAuthorsForForm(),
                     postsApi.getBySlug(postSlug),
                 ]);
 
-                if (tagsRes.success && tagsRes.data) {
-                    setTags(Array.isArray(tagsRes.data) ? tagsRes.data : []);
-                }
-                if (authorsRes.success && authorsRes.data) {
-                    setAuthors(Array.isArray(authorsRes.data) ? authorsRes.data : []);
-                }
+                setTags(Array.isArray(tagsData) ? tagsData as any : []);
+                setAuthors(Array.isArray(authorsData) ? authorsData as any : []);
 
                 if (postRes.success && postRes.data) {
                     const post = postRes.data as Post;
@@ -105,11 +105,11 @@ export default function EditPostPage() {
         // Validate
         const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
         if (!validTypes.includes(file.type)) {
-            alert("Formato no válido. Usa JPG, PNG, GIF o WEBP.");
+            toast.error("Formato no válido", { description: "Usa JPG, PNG, GIF o WEBP" });
             return;
         }
         if (file.size > 5 * 1024 * 1024) {
-            alert("La imagen es muy grande. Máximo 5MB.");
+            toast.error("Imagen muy grande", { description: "El tamaño máximo es 5MB" });
             return;
         }
 
@@ -120,12 +120,13 @@ export default function EditPostPage() {
 
             if (response.success && response.data?.url) {
                 setFormData((prev) => ({ ...prev, coverImage: response.data!.url }));
+                toast.success("Imagen subida correctamente");
             } else {
-                alert(response.message || "Error al subir la imagen");
+                toast.error("Error al subir la imagen", { description: response.message });
             }
         } catch (err) {
             console.error("Upload error:", err);
-            alert("Error al subir la imagen");
+            toast.error("Error al subir la imagen");
         }
 
         setIsUploading(false);
@@ -138,14 +139,45 @@ export default function EditPostPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate with Zod
+        const postData = {
+            title: formData.title,
+            slug: formData.slug || undefined,
+            content: formData.content,
+            excerpt: formData.excerpt || undefined,
+            authorId: formData.authorId,
+            status: formData.status,
+            isPremium: formData.isPremium,
+            tagIds: formData.tagIds,
+            coverImage: formData.coverImage || undefined,
+        };
+
+        const validation = postSchema.safeParse(postData);
+
+        if (!validation.success) {
+            const firstError = validation.error.issues[0];
+            toast.error("Error de validación", {
+                description: firstError.message
+            });
+            return;
+        }
+
         setIsSaving(true);
 
-        const response = await postsApi.update(postId, formData);
+        // Cast to match API expected types
+        const updateData = {
+            ...validation.data,
+            status: validation.data.status as "DRAFT" | "PUBLISHED",
+        };
+        const response = await postsApi.update(postId, updateData);
 
         if (response.success) {
+            await revalidatePosts(validation.data.slug);
+            toast.success("Post actualizado correctamente");
             router.push("/admin/posts");
         } else {
-            alert(response.message || "Error al actualizar el post");
+            toast.error("Error al actualizar el post", { description: response.message });
         }
 
         setIsSaving(false);

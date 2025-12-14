@@ -56,9 +56,9 @@ export default function ArticleContent({ post }: Props) {
                                     href={`/blog/autor/${post.author.slug}`}
                                     className="flex items-center gap-2 hover:text-primary transition-colors"
                                 >
-                                    {post.author.avatar ? (
+                                    {post.author.avatarUrl ? (
                                         <Image
-                                            src={post.author.avatar}
+                                            src={post.author.avatarUrl}
                                             alt={post.author.name}
                                             width={32}
                                             height={32}
@@ -122,9 +122,9 @@ export default function ArticleContent({ post }: Props) {
                         <div className="mt-12 p-6 bg-card rounded-2xl border border-border">
                             <div className="flex items-start gap-4">
                                 <div className="relative h-16 w-16 flex-shrink-0">
-                                    {post.author.avatar ? (
+                                    {post.author.avatarUrl ? (
                                         <Image
-                                            src={post.author.avatar}
+                                            src={post.author.avatarUrl}
                                             alt={post.author.name}
                                             fill
                                             className="rounded-full object-cover"

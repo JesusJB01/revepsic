@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: author.bio || `Artículos escritos por ${author.name}`,
         openGraph: {
             title: author.name,
-            description: author.bio,
+            description: author.bio || undefined,
             type: 'profile',
-            images: author.avatar ? [author.avatar] : [],
+            images: author.avatarUrl ? [author.avatarUrl] : [],
         },
     };
 }
@@ -67,9 +67,9 @@ export default async function AuthorPage({ params, searchParams }: Props) {
                 {/* Author Header */}
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-12 p-8 bg-card rounded-2xl border border-border">
                     <div className="relative h-24 w-24 flex-shrink-0">
-                        {author.avatar ? (
+                        {author.avatarUrl ? (
                             <Image
-                                src={author.avatar}
+                                src={author.avatarUrl}
                                 alt={author.name}
                                 fill
                                 className="rounded-full object-cover"

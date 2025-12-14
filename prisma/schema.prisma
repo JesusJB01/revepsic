@@ -1,14 +1,330 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  passwordHash        String
+  name                String
+  avatarUrl           String?
+  role                UserRole             @default(EDITOR)
+  isActive            Boolean              @default(true)
+  lastLoginAt         DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  passwordResetTokens PasswordResetToken[]
+  posts               Post[]
+  sessions            Session[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Author {
+  id         String       @id @default(cuid())
+  slug       String       @unique
+  name       String
+  email      String?      @unique
+  avatarUrl  String?
+  status     AuthorStatus @default(VERIFIED)
+  bio        String?
+  specialty  String?
+  profession String?
+  education  String?
+  experience String?
+  website    String?
+  twitter    String?
+  linkedin   String?
+  github     String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  posts      Post[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([name])
+}
+
+model Post {
+  id              String      @id @default(cuid())
+  slug            String      @unique
+  title           String
+  excerpt         String?
+  content         String
+  coverImage      String?
+  status          PostStatus  @default(DRAFT)
+  isPremium       Boolean     @default(false)
+  metaTitle       String?
+  metaDescription String?
+  viewCount       Int         @default(0)
+  readTime        Int?
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  authorId        String
+  createdById     String
+  author          Author      @relation(fields: [authorId], references: [id])
+  createdBy       User        @relation(fields: [createdById], references: [id])
+  images          PostImage[]
+  tags            PostTag[]
+
+  @@index([slug])
+  @@index([status, publishedAt])
+  @@index([isPremium])
+  @@index([authorId])
+}
+
+model PostImage {
+  id        String   @id @default(cuid())
+  postId    String
+  url       String
+  alt       String?
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  color       String?
+  createdAt   DateTime  @default(now())
+  posts       PostTag[]
+
+  @@index([slug])
+  @@index([name])
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model Subscriber {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  tier           SubscriberTier   @default(FREE)
+  status         SubscriberStatus @default(PENDING)
+  confirmedAt    DateTime?
+  unsubscribedAt DateTime?
+  premiumSince   DateTime?
+  premiumUntil   DateTime?
+  source         String?
+  ipAddress      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([tier])
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  postId    String?
+  path      String
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@index([createdAt])
+  @@index([path])
+}
+
+model ApiMetric {
+  id           String   @id @default(cuid())
+  endpoint     String
+  method       String
+  statusCode   Int
+  responseTime Int
+  userId       String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  @@index([endpoint])
+  @@index([createdAt])
+  @@index([statusCode])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model Member {
+  id                 String            @id @default(cuid())
+  slug               String            @unique
+  name               String
+  position           String
+  category           MemberCategory    @default(ASOCIADOS)
+  bio                String
+  image              String
+  whatsapp           String?
+  phone              String?
+  email              String?
+  website            String?
+  facebook           String?
+  instagram          String?
+  twitter            String?
+  linkedin           String?
+  city               String?
+  state              String?
+  country            String?           @default("Venezuela")
+  subscriptionPlan   SubscriptionPlan  @default(DIRECTORY_ONLY)
+  subscriptionType   SubscriptionType?
+  subscriptionStart  DateTime?
+  subscriptionEnd    DateTime?
+  isVerified         Boolean           @default(false)
+  memberSince        DateTime?
+  gender             String?
+  birthDate          DateTime?
+  licenseNumber      String?
+  experienceYears    Int?
+  profileDescription String?
+  specialties        Json?
+  therapies          Json?
+  disorders          Json?
+  languages          Json?
+  targetAges         Json?
+  certifications     Json?
+  education          Json?
+  consultationTypes  Json?
+  acceptsInsurance   Boolean           @default(false)
+  insuranceProviders Json?
+  priceRange         Json?
+  firstSessionFree   Boolean           @default(false)
+  schedule           Json?
+  locations          Json?
+  videoUrl           String?
+  isActive           Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  comments           Comment[]
+
+  @@index([category])
+  @@index([isActive])
+  @@index([subscriptionPlan])
+  @@index([subscriptionEnd])
+  @@index([city])
+  @@index([isVerified])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  memberId    String
+  authorName  String
+  authorEmail String
+  rating      Int      @default(5)
+  content     String
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@index([isApproved])
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum AuthorStatus {
+  MEMBER
+  VERIFIED
+  GUEST
+}
+
+enum PostStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SubscriberTier {
+  FREE
+  PREMIUM
+}
+
+enum SubscriberStatus {
+  PENDING
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+}
+
+enum MemberCategory {
+  FUNDADORES
+  TITULARES
+  ASOCIADOS
+}
+
+enum SubscriptionPlan {
+  DIRECTORY_ONLY
+  ASOCIADO_PLUS
+  ASOCIADO_PRO
+}
+
+enum SubscriptionType {
+  MONTHLY
+  ANNUAL
 }

@@ -11,10 +11,13 @@ interface ArticleData {
 }
 
 export async function getData() {
-  const api = process.env.URL_VERCEL;
+  // Get the site URL from environment or use localhost for development
+  // In Vercel, you can set NEXT_PUBLIC_SITE_URL or use VERCEL_URL
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
   try {
-    const response = await fetch(`${api}/api/blog`, { cache: "no-store" });
+    const response = await fetch(`${baseUrl}/api/blog`, { cache: "no-store" });
 
     if (!response.ok) {
       console.error("Error al obtener datos de la API");
@@ -26,7 +29,7 @@ export async function getData() {
     return data;
   } catch (error) {
     console.error("Error al obtener datos:", error);
-    throw error; // Propaga el error para que pueda ser manejado más arriba si es necesario.
+    throw error;
   }
 }
 
@@ -65,9 +68,9 @@ export default async function Blog() {
                   Psicologia
                 </h2>
                 <p className="text-justify  pb-10">
-                 REVEPSIC presentará una mesa de trabajo sobre <br />
+                  REVEPSIC presentará una mesa de trabajo sobre <br />
                   <strong>
-                  Psicología Basada en Evidencia: Promoviendo la Práctica  Psicológica Fundamentada
+                    Psicología Basada en Evidencia: Promoviendo la Práctica  Psicológica Fundamentada
                   </strong>
                 </p>
                 <div>
@@ -94,7 +97,7 @@ export default async function Blog() {
                 />
               ))} */}
 
-              <JustArticle/>
+              <JustArticle />
             </div>
           </div>
         </div>

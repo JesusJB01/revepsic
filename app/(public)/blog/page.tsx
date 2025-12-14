@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
 import { getPosts, getTags, Post, Tag } from '@/lib/server-api';
 import PageHeader from '@/components/PageHeader';
 import BlogFilters from './blog-filters';
@@ -21,6 +22,11 @@ export default async function BlogPage({ searchParams }: Props) {
   const tag = params.tag || '';
   const searchQuery = params.q || '';
 
+  // Validate page number
+  if (page < 1) {
+    redirect('/blog');
+  }
+
   // Fetching paralelo con Promise.all
   const [postsResponse, tagsResponse] = await Promise.all([
     getPosts({
@@ -33,20 +39,23 @@ export default async function BlogPage({ searchParams }: Props) {
   ]);
 
   // Extraer datos con manejo seguro
-  // Estructura de respuesta: { success: true, data: { data: Post[], pagination: {...} } }
   const responseData = postsResponse?.data;
   let posts: Post[] = [];
   let pagination = { page: 1, totalPages: 1, total: 0, limit: 6 };
 
   if (responseData) {
-    // Si responseData tiene .data (estructura anidada del backend)
     if (responseData.data && Array.isArray(responseData.data)) {
       posts = responseData.data;
       pagination = responseData.pagination || pagination;
     } else if (Array.isArray(responseData)) {
-      // Fallback: si responseData es directamente un array
       posts = responseData;
     }
+  }
+
+  // Redirect to page 1 if requested page exceeds total pages
+  if (page > 1 && page > pagination.totalPages) {
+    const redirectUrl = tag ? `/blog?tag=${tag}` : '/blog';
+    redirect(redirectUrl);
   }
 
   const tagsData = tagsResponse?.data;

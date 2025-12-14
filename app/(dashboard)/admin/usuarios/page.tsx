@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { authApi } from "@/lib/api";
 import { Plus, UserCheck, UserX, Shield, Trash2 } from "lucide-react";
 import RoleGuard from "@/components/auth/RoleGuard";
+import { toast } from "sonner";
+import { fetchUsersFromDb } from "@/lib/actions/admin-data";
 
 interface User {
     id: string;
@@ -30,13 +32,9 @@ export default function UsersAdminPage() {
 
     const fetchUsers = async () => {
         try {
-            const response = await authApi.getUsers();
-            if (response.success && response.data) {
-                // Handle different response structures
-                const usersData = Array.isArray(response.data)
-                    ? response.data
-                    : (response.data as { users?: User[] }).users || [];
-                setUsers(usersData as User[]);
+            const users = await fetchUsersFromDb();
+            if (users) {
+                setUsers(users as User[]);
             } else {
                 setUsers([]);
             }
@@ -54,8 +52,9 @@ export default function UsersAdminPage() {
             setShowModal(false);
             setNewUser({ email: "", password: "", name: "", role: "VIEWER" });
             fetchUsers();
+            toast.success("Usuario creado correctamente");
         } else {
-            alert("Error al crear usuario");
+            toast.error("Error al crear usuario", { description: response.message });
         }
     };
 
@@ -73,8 +72,9 @@ export default function UsersAdminPage() {
         const response = await authApi.updateUserStatus(id, false);
         if (response.success) {
             setUsers((users || []).map((u) => (u.id === id ? { ...u, isActive: false } : u)));
+            toast.success(`${name} desactivado correctamente`);
         } else {
-            alert("Error al desactivar usuario");
+            toast.error("Error al desactivar usuario");
         }
     };
 
